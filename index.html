@@ -1,213 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roulette of Fates 👻</title>
-<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  body {
-    background: #000;
-    color: #fff;
-    font-family: 'Montserrat', sans-serif;
-    text-align: center;
-    padding: 40px 20px;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roulette of Fates 👻</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: black;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 2em;
+      overflow-x: hidden;
+    }
 
-  h1 {
-    font-family: 'Creepster', cursive;
-    font-size: 3em;
-    margin-bottom: 10px;
-    color: #fff;
-    text-shadow: 0 0 10px #fff;
-  }
+    /* 🌀 Ghostly smoke effect behind header */
+    .smoke {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  input, button, textarea {
-    font-family: inherit;
-  }
+    .smoke::before, .smoke::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: smokeMove 20s infinite ease-in-out;
+      transform: translateX(-50%);
+    }
 
-  input[type="email"] {
-    padding: 10px;
-    width: 250px;
-    border-radius: 8px;
-    border: none;
-    text-align: center;
-  }
+    .smoke::after {
+      animation-delay: -10s;
+      opacity: 0.6;
+    }
 
-  button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 8px;
-    background: #fff;
-    color: #000;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
+    @keyframes smokeMove {
+      0% { transform: translate(-50%, 0) scale(1); }
+      50% { transform: translate(-45%, -10%) scale(1.1); }
+      100% { transform: translate(-55%, 0) scale(1); }
+    }
 
-  button:hover {
-    box-shadow: 0 0 10px #fff;
-    transform: scale(1.05);
-  }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 0.5em;
+      text-shadow: 0 0 20px white;
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 1;
+    }
 
-  #result-area {
-    margin-top: 25px;
-    background: #fff;
-    color: #000;
-    padding: 25px;
-    border-radius: 10px;
-    max-width: 400px;
-    margin: 30px auto;
-    box-shadow: 0 0 15px rgba(255,255,255,0.2);
-    font-size: 18px;
-    display: none;
-    animation: fadeBounce 0.8s ease forwards;
-  }
+    input, button, textarea {
+      font-family: inherit;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 1em;
+    }
 
-  @keyframes fadeBounce {
-    0% {opacity:0; transform:translateY(20px);}
-    60% {opacity:1; transform:translateY(-8px);}
-    100% {transform:translateY(0);}
-  }
+    input {
+      width: 280px;
+      border: none;
+      outline: none;
+    }
 
-  #adminPanel {
-    display: none;
-    text-align: left;
-    background: #111;
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
-    box-shadow: 0 0 10px rgba(255,255,255,0.1);
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+    button {
+      background: white;
+      color: black;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
 
-  textarea {
-    width: 100%;
-    border-radius: 8px;
-    padding: 8px;
-    border: none;
-    background: #222;
-    color: #fff;
-    resize: vertical;
-  }
+    button:hover {
+      background: #ddd;
+      transform: scale(1.05);
+    }
 
-  label {font-weight:600;}
+    .result-box {
+      background: white;
+      color: black;
+      display: inline-block;
+      padding: 1.5em;
+      border-radius: 12px;
+      margin-top: 1.5em;
+      min-width: 300px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.8s ease;
+    }
 
-  .adminBtn {
-    background:#fff;
-    color:#000;
-    border-radius:6px;
-    padding:8px 15px;
-    cursor:pointer;
-    margin-top:10px;
-  }
+    .result-box.show {
+      opacity: 1;
+      transform: scale(1);
+      animation: eerieGlow 3s ease-in-out infinite alternate;
+    }
 
-  .adminBtn:hover {
-    box-shadow:0 0 10px #fff;
-  }
-</style>
+    @keyframes eerieGlow {
+      0% {
+        text-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 20px rgba(255,255,255,0.6);
+        box-shadow: 0 0 12px rgba(255,255,255,0.2);
+      }
+      100% {
+        text-shadow: 0 0 8px #fff, 0 0 20px #fff, 0 0 40px rgba(255,255,255,0.8);
+        box-shadow: 0 0 25px rgba(255,255,255,0.4);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .admin-panel {
+      background: #1a1a1a;
+      color: white;
+      width: 380px;
+      margin: 2em auto;
+      padding: 1.5em;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-bottom: 1em;
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      resize: none;
+    }
+
+    /* 👻 Subtle Admin Login link */
+    #admin-login {
+      margin-top: 2em;
+      background: none;
+      color: white;
+      border: none;
+      font-size: 0.8em;
+      text-decoration: underline;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.4s ease, text-shadow 0.4s ease;
+    }
+
+    #admin-login:hover {
+      opacity: 1;
+      text-shadow: 0 0 8px white;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
+  <div class="smoke"></div>
+  <h1>Roulette of Fates 👻</h1>
+  <p>Enter your registered email below and spin for your destiny...</p>
 
-<h1>🎡 Roulette of Fates</h1>
-<p>Enter your registered email below and spin for your destiny…</p>
+  <input type="email" id="emailInput" placeholder="Enter your email" />
+  <button onclick="spin()">Spin</button>
 
-<input type="email" id="email" placeholder="your@email.com">
-<button id="spinBtn">Spin</button>
+  <div id="resultBox" class="result-box hidden"></div>
 
-<div id="result-area">
-  <h3>Your Result:</h3>
-  <div id="resultText">No result yet — spin to find out!</div>
-</div>
+  <button id="admin-login" onclick="toggleLogin()">👻 Admin Login</button>
 
-<button id="adminToggle" class="adminBtn">👻 Admin Login</button>
+  <div id="loginBox" class="hidden fade-in">
+    <p>Enter password:</p>
+    <input type="password" id="adminPass" placeholder="Password" />
+    <button onclick="checkLogin()">Enter</button>
+  </div>
 
-<div id="adminPanel">
-  <h2 style="text-align:center;">🕯️ Admin Panel</h2>
-  <label>Emails (one per line):</label><br>
-  <textarea id="emailList" rows="6" placeholder="Enter emails here..."></textarea><br><br>
-  <label>Results (codename, gender per line):</label><br>
-  <textarea id="resultList" rows="6" placeholder="Enter results here..."></textarea><br><br>
-  <button id="saveAdmin" class="adminBtn">💾 Save Lists</button>
-</div>
+  <div id="adminPanel" class="admin-panel hidden fade-in">
+    <h3>🕯️ Admin Panel</h3>
+    <p><b>Emails (one per line):</b></p>
+    <textarea id="emailList" placeholder="example@email.com"></textarea>
 
-<script>
-  const ADMIN_PASSWORD = "escape2025";
-  let validEmails = [];
-  let results = [];
-  let assigned = {};
+    <p><b>Results (codename, gender per line):</b></p>
+    <textarea id="resultList" placeholder="Falcon, Male"></textarea>
 
-  // Load from storage
-  try {
-    validEmails = JSON.parse(localStorage.getItem("validEmails")) || [];
-    results = JSON.parse(localStorage.getItem("results")) || [];
-    assigned = JSON.parse(localStorage.getItem("assignedRoulette")) || {};
-  } catch(e){}
+    <button onclick="saveLists()">💾 Save Lists</button>
+    <button onclick="generateAssignments()">🎲 Generate Assignments</button>
+    <button onclick="resetAssignments()">♻️ Reset Assignments</button>
+  </div>
 
-  const emailInput = document.getElementById("email");
-  const spinBtn = document.getElementById("spinBtn");
-  const resultArea = document.getElementById("result-area");
-  const resultText = document.getElementById("resultText");
-  const adminPanel = document.getElementById("adminPanel");
-  const adminToggle = document.getElementById("adminToggle");
+  <script>
+    const correctPassword = "escape2025";
+    let emailResults = {};
+    let emails = [];
+    let results = [];
 
-  adminToggle.addEventListener("click", ()=>{
-    if(adminPanel.style.display === "block"){
-      adminPanel.style.display = "none";
-      return;
-    }
-    const pw = prompt("Enter Admin Password:");
-    if(pw === ADMIN_PASSWORD){
-      adminPanel.style.display = "block";
-      document.getElementById("emailList").value = validEmails.join("\\n");
-      document.getElementById("resultList").value = results.map(r=>`${r.codeName}, ${r.gender}`).join("\\n");
-    } else {
-      alert("❌ Incorrect password!");
-    }
-  });
-
-  document.getElementById("saveAdmin").addEventListener("click", ()=>{
-    validEmails = document.getElementById("emailList").value.split("\\n").map(e=>e.trim()).filter(e=>e);
-    results = document.getElementById("resultList").value.split("\\n").map(line=>{
-      const [codeName, gender] = line.split(",").map(v=>v.trim());
-      return {codeName, gender};
-    }).filter(r=>r.codeName);
-    localStorage.setItem("validEmails", JSON.stringify(validEmails));
-    localStorage.setItem("results", JSON.stringify(results));
-    alert("✅ Lists saved!");
-  });
-
-  spinBtn.addEventListener("click", ()=>{
-    const email = emailInput.value.trim().toLowerCase();
-    if(!email){
-      alert("⚠️ Please enter your email first.");
-      return;
-    }
-    if(!validEmails.includes(email)){
-      resultText.textContent = "❌ Sorry! Your email is not registered.";
-      resultArea.style.display = "block";
-      return;
+    function toggleLogin() {
+      document.getElementById("loginBox").classList.toggle("hidden");
     }
 
-    if(!assigned[email]){
-      if(results.length===0){
-        resultText.textContent = "⚠️ All results have been assigned!";
-        resultArea.style.display = "block";
+    function checkLogin() {
+      const entered = document.getElementById("adminPass").value.trim();
+      if (entered === correctPassword) {
+        document.getElementById("adminPanel").classList.remove("hidden");
+        document.getElementById("loginBox").classList.add("hidden");
+      } else {
+        alert("Wrong password, ghostly friend!");
+      }
+    }
+
+    function saveLists() {
+      emails = document.getElementById("emailList").value.trim().split("\n").filter(e => e);
+      results = document.getElementById("resultList").value.trim().split("\n").filter(r => r);
+      localStorage.setItem("emails", JSON.stringify(emails));
+      localStorage.setItem("results", JSON.stringify(results));
+      alert("Lists saved! 🕸️");
+    }
+
+    function generateAssignments() {
+      if (emails.length === 0 || results.length === 0) {
+        alert("Please make sure both lists are filled before generating!");
         return;
       }
-      const randomIndex = Math.floor(Math.random()*results.length);
-      const chosen = results.splice(randomIndex,1)[0];
-      assigned[email] = chosen;
-      localStorage.setItem("assignedRoulette", JSON.stringify(assigned));
-      localStorage.setItem("results", JSON.stringify(results));
+
+      const shuffledResults = [...results].sort(() => Math.random() - 0.5);
+      emailResults = {};
+      emails.forEach((email, i) => {
+        emailResults[email.toLowerCase()] = shuffledResults[i % shuffledResults.length];
+      });
+
+      localStorage.setItem("emailResults", JSON.stringify(emailResults));
+      alert("Assignments generated! 🎃");
     }
 
-    const chosen = assigned[email];
-    resultText.innerHTML = `🎯 <b>Codename:</b> ${chosen.codeName}<br>👤 <b>Gender:</b> ${chosen.gender}`;
-    resultArea.style.display = "block";
-    resultArea.style.animation = "fadeBounce 0.8s ease forwards";
-  });
-</script>
+    function resetAssignments() {
+      localStorage.removeItem("emailResults");
+      alert("Assignments reset. 👻");
+    }
+
+    function spin() {
+      const email = document.getElementById("emailInput").value.trim().toLowerCase();
+      const resultBox = document.getElementById("resultBox");
+      const storedResults = JSON.parse(localStorage.getItem("emailResults") || "{}");
+
+      if (storedResults[email]) {
+        resultBox.innerHTML = `<h3>Your Result:</h3><p>${storedResults[email]}</p>`;
+      } else {
+        resultBox.innerHTML = `<h3>Your Result:</h3><p>❌ Sorry! Your email is not registered.</p>`;
+      }
+
+      resultBox.classList.remove("hidden");
+      resultBox.classList.remove("show");
+      void resultBox.offsetWidth;
+      resultBox.classList.add("show");
+    }
+
+    window.onload = () => {
+      const savedEmails = JSON.parse(localStorage.getItem("emails") || "[]");
+      const savedResults = JSON.parse(localStorage.getItem("results") || "[]");
+      document.getElementById("emailList").value = savedEmails.join("\n");
+      document.getElementById("resultList").value = savedResults.join("\n");
+    };
+  </script>
 </body>
 </html>
