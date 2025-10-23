@@ -1,320 +1,213 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Hosted Email Roulette (Admin)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roulette of Fates 👻</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root{ --bg:#111; --card:#ffd9cf; --accent:#ff6b6b; --muted:#222; --panel:#fff; }
-  body{font-family:Inter, Arial, sans-serif; margin:0; min-height:100vh; background:linear-gradient(180deg,#000,#111); color:#111; display:flex; align-items:center; justify-content:center; padding:28px; box-sizing:border-box;}
-  .wrap{ width:100%; max-width:920px; background:linear-gradient(180deg,#ffd9cf,#ffc6b9); border-radius:12px; padding:28px; box-shadow:0 18px 40px rgba(0,0,0,0.6); text-align:center; }
-  h1{ margin:0 0 8px; font-size:22px; letter-spacing:0.6px; }
-  .muted{ color:#333; margin-bottom:16px; }
-  input[type=email]{ padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); width:260px; text-align:center; }
-  button{ padding:9px 12px; border-radius:8px; border:0; background:var(--accent); color:white; cursor:pointer; margin-left:10px; }
-  .resultBox{ margin:18px auto 0; background:var(--panel); border-radius:10px; padding:18px; width:80%; max-width:520px; box-shadow:0 8px 20px rgba(0,0,0,0.12); }
-  .adminBtn{ margin-top:14px; background:#444; color:white; padding:8px 12px; border-radius:8px; }
-  /* admin panel */
-  .adminPanel{ display:none; margin-top:18px; text-align:left; background:#fff; padding:14px; border-radius:10px; }
-  textarea{ width:100%; box-sizing:border-box; border-radius:6px; padding:8px; font-family:monospace; }
-  .row{ display:flex; gap:8px; align-items:center; margin-top:8px; }
-  .small{ font-size:13px; color:#444; }
-  .controls { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
-  .csvLink{ color:#0066cc; cursor:pointer; text-decoration:underline; background:none; border:none; }
-  .danger{ background:#c53d3d; }
-  .ok{ background:#2e8b57; }
-  footer{ margin-top:12px; font-size:12px; color:#222; opacity:0.9; }
-  .hidden{ display:none !important; }
-  @media (max-width:640px){ .wrap{ padding:18px } input[type=email]{ width:200px } .resultBox{ width:92% } }
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  h1 {
+    font-family: 'Creepster', cursive;
+    font-size: 3em;
+    margin-bottom: 10px;
+    color: #fff;
+    text-shadow: 0 0 10px #fff;
+  }
+
+  input, button, textarea {
+    font-family: inherit;
+  }
+
+  input[type="email"] {
+    padding: 10px;
+    width: 250px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+  }
+
+  button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  button:hover {
+    box-shadow: 0 0 10px #fff;
+    transform: scale(1.05);
+  }
+
+  #result-area {
+    margin-top: 25px;
+    background: #fff;
+    color: #000;
+    padding: 25px;
+    border-radius: 10px;
+    max-width: 400px;
+    margin: 30px auto;
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    font-size: 18px;
+    display: none;
+    animation: fadeBounce 0.8s ease forwards;
+  }
+
+  @keyframes fadeBounce {
+    0% {opacity:0; transform:translateY(20px);}
+    60% {opacity:1; transform:translateY(-8px);}
+    100% {transform:translateY(0);}
+  }
+
+  #adminPanel {
+    display: none;
+    text-align: left;
+    background: #111;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  textarea {
+    width: 100%;
+    border-radius: 8px;
+    padding: 8px;
+    border: none;
+    background: #222;
+    color: #fff;
+    resize: vertical;
+  }
+
+  label {font-weight:600;}
+
+  .adminBtn {
+    background:#fff;
+    color:#000;
+    border-radius:6px;
+    padding:8px 15px;
+    cursor:pointer;
+    margin-top:10px;
+  }
+
+  .adminBtn:hover {
+    box-shadow:0 0 10px #fff;
+  }
 </style>
 </head>
 <body>
 
-<div class="wrap" role="main" aria-label="Email Roulette App">
-  <h1>🎯 Spin the Roulette</h1>
-  <div class="muted">Enter your registered email to get your assigned codename</div>
+<h1>🎡 Roulette of Fates</h1>
+<p>Enter your registered email below and spin for your destiny…</p>
 
-  <div>
-    <input id="visitorEmail" type="email" placeholder="your@email.com" aria-label="email">
-    <button id="getResultBtn">Get Result</button>
-  </div>
+<input type="email" id="email" placeholder="your@email.com">
+<button id="spinBtn">Spin</button>
 
-  <div class="resultBox" id="resultBox">
-    <div style="font-weight:700">Your Result:</div>
-    <div id="resultContent" style="margin-top:10px; font-size:15px; color:#333;">No result yet — enter your email and click Get Result.</div>
-  </div>
+<div id="result-area">
+  <h3>Your Result:</h3>
+  <div id="resultText">No result yet — spin to find out!</div>
+</div>
 
-  <div style="text-align:center;">
-    <button id="adminLogin" class="adminBtn">🔐 Admin Login</button>
-  </div>
+<button id="adminToggle" class="adminBtn">👻 Admin Login</button>
 
-  <!-- Admin Panel -->
-  <div class="adminPanel" id="adminPanel" aria-hidden="true">
-    <h3>Admin — Manage Lists & Assignments</h3>
-    <div class="small">1) Edit allowed emails (one per line):</div>
-    <textarea id="emailList" rows="6" placeholder="one@example.com"></textarea>
-
-    <div style="height:8px;"></div>
-    <div class="small">2) Edit results (one per line): <code>Codename, Gender, Link (optional)</code></div>
-    <textarea id="resultsList" rows="8" placeholder="Falcon, Male, https://..."></textarea>
-
-    <div class="controls">
-      <button id="saveLists" class="ok">💾 Save Lists</button>
-      <button id="generateAssignments">🎲 Generate Assignments</button>
-      <button id="exportCSV">⬇️ Export CSV</button>
-      <button id="importCSV">⬆️ Import CSV</button>
-      <button id="resetAssign" class="danger">Reset Assignments</button>
-    </div>
-
-    <div style="margin-top:12px;">
-      <div class="small"><strong>Note:</strong> Assignments are stored in <code>localStorage</code> for this host origin. If you need globally shared results across visitors, I can add a simple backend (Google Sheets / Firebase) — ask me and I’ll provide that version.</div>
-    </div>
-  </div>
-
-  <footer>Host this file on GitHub Pages or Netlify and embed via &lt;iframe&gt; into EventMobi.</footer>
+<div id="adminPanel">
+  <h2 style="text-align:center;">🕯️ Admin Panel</h2>
+  <label>Emails (one per line):</label><br>
+  <textarea id="emailList" rows="6" placeholder="Enter emails here..."></textarea><br><br>
+  <label>Results (codename, gender per line):</label><br>
+  <textarea id="resultList" rows="6" placeholder="Enter results here..."></textarea><br><br>
+  <button id="saveAdmin" class="adminBtn">💾 Save Lists</button>
 </div>
 
 <script>
-/* --------------------------
-  CONFIG: prefill lists with your data
----------------------------*/
-const ADMIN_HASH = "5ae91dfd489e20b5a1303cb30735ae55e4be29bd8c6958b0a31281ba2504eb91"; // SHA-256 of "escape2025"
+  const ADMIN_PASSWORD = "escape2025";
+  let validEmails = [];
+  let results = [];
+  let assigned = {};
 
-const defaultEmails = [
-  "jane@example.com",
-  "john@example.com",
-  "max@example.com"
-];
-
-const defaultResults = [
-  { codeName: "Falcon", gender: "Male", link: "" },
-  { codeName: "Viper", gender: "Female", link: "" },
-  { codeName: "Lynx", gender: "Male", link: "" },
-  { codeName: "Raven", gender: "Female", link: "" }
-];
-
-/* --------------------------
-  STORAGE KEYS
----------------------------*/
-const KEY_EMAILS = "er_emails_v1";
-const KEY_RESULTS = "er_results_v1";
-const KEY_ASSIGN = "er_assign_v1";
-
-/* --------------------------
-  Utilities
----------------------------*/
-function safeJSONParse(s, fallback){ try { const v = JSON.parse(s); return v === null ? fallback : v; } catch(e){ return fallback; } }
-function download(filename, text){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type:'text/csv'})); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); }
-
-/* --------------------------
-  Load / Save lists and assignments
----------------------------*/
-let emails = safeJSONParse(localStorage.getItem(KEY_EMAILS), defaultEmails.slice());
-let results = safeJSONParse(localStorage.getItem(KEY_RESULTS), defaultResults.slice());
-let assignments = safeJSONParse(localStorage.getItem(KEY_ASSIGN), {}); // { email: resultObject }
-
-function saveListsToStorage(){
-  localStorage.setItem(KEY_EMAILS, JSON.stringify(emails));
-  localStorage.setItem(KEY_RESULTS, JSON.stringify(results));
-}
-function saveAssignmentsToStorage(){
-  localStorage.setItem(KEY_ASSIGN, JSON.stringify(assignments));
-}
-
-/* --------------------------
-  UI elements
----------------------------*/
-const visitorEmail = document.getElementById("visitorEmail");
-const getResultBtn = document.getElementById("getResultBtn");
-const resultContent = document.getElementById("resultContent");
-
-const adminLoginBtn = document.getElementById("adminLogin");
-const adminPanel = document.getElementById("adminPanel");
-const emailListTA = document.getElementById("emailList");
-const resultsListTA = document.getElementById("resultsList");
-const saveListsBtn = document.getElementById("saveLists");
-const generateBtn = document.getElementById("generateAssignments");
-const exportCSVBtn = document.getElementById("exportCSV");
-const importCSVBtn = document.getElementById("importCSV");
-const resetAssignBtn = document.getElementById("resetAssign");
-
-/* --------------------------
-  Initialize admin textareas
----------------------------*/
-function fillAdminFields(){
-  emailListTA.value = emails.join("\n");
-  resultsListTA.value = results.map(r => `${r.codeName}, ${r.gender}${r.link ? ', ' + r.link : ''}`).join("\n");
-}
-fillAdminFields();
-
-/* --------------------------
-  Hash (SHA-256) helper using Web Crypto
----------------------------*/
-async function sha256hex(message){
-  const encoder = new TextEncoder();
-  const data = encoder.encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-/* --------------------------
-  Admin login flow
----------------------------*/
-adminLoginBtn.addEventListener("click", async () => {
+  // Load from storage
   try {
-    const pw = prompt("Enter admin password:");
-    if(pw === null) return;
-    const h = await sha256hex(pw);
-    if(h === ADMIN_HASH){
+    validEmails = JSON.parse(localStorage.getItem("validEmails")) || [];
+    results = JSON.parse(localStorage.getItem("results")) || [];
+    assigned = JSON.parse(localStorage.getItem("assignedRoulette")) || {};
+  } catch(e){}
+
+  const emailInput = document.getElementById("email");
+  const spinBtn = document.getElementById("spinBtn");
+  const resultArea = document.getElementById("result-area");
+  const resultText = document.getElementById("resultText");
+  const adminPanel = document.getElementById("adminPanel");
+  const adminToggle = document.getElementById("adminToggle");
+
+  adminToggle.addEventListener("click", ()=>{
+    if(adminPanel.style.display === "block"){
+      adminPanel.style.display = "none";
+      return;
+    }
+    const pw = prompt("Enter Admin Password:");
+    if(pw === ADMIN_PASSWORD){
       adminPanel.style.display = "block";
-      adminLoginBtn.style.display = "none";
-      fillAdminFields();
-      alert("Admin unlocked — edit lists and Save.");
+      document.getElementById("emailList").value = validEmails.join("\\n");
+      document.getElementById("resultList").value = results.map(r=>`${r.codeName}, ${r.gender}`).join("\\n");
     } else {
-      alert("Incorrect password.");
+      alert("❌ Incorrect password!");
     }
-  } catch(e){
-    alert("Admin login failed. Browser may not support crypto APIs.");
-  }
-});
+  });
 
-/* --------------------------
-  Admin: Save lists
----------------------------*/
-saveListsBtn.addEventListener("click", () => {
-  const eLines = emailListTA.value.split("\n").map(l => l.trim()).filter(l => l);
-  const rLines = resultsListTA.value.split("\n").map(l => l.trim()).filter(l => l);
-  emails = Array.from(new Set(eLines)); // dedupe
-  results = rLines.map(line => {
-    const parts = line.split(",").map(p => p.trim());
-    return { codeName: parts[0] || "", gender: parts[1] || "", link: (parts[2]||"") };
-  }).filter(r => r.codeName);
-  saveListsToStorage();
-  alert("Lists saved.");
-});
+  document.getElementById("saveAdmin").addEventListener("click", ()=>{
+    validEmails = document.getElementById("emailList").value.split("\\n").map(e=>e.trim()).filter(e=>e);
+    results = document.getElementById("resultList").value.split("\\n").map(line=>{
+      const [codeName, gender] = line.split(",").map(v=>v.trim());
+      return {codeName, gender};
+    }).filter(r=>r.codeName);
+    localStorage.setItem("validEmails", JSON.stringify(validEmails));
+    localStorage.setItem("results", JSON.stringify(results));
+    alert("✅ Lists saved!");
+  });
 
-/* --------------------------
-  Admin: Generate assignments (assign all listed emails a unique random result)
----------------------------*/
-generateBtn.addEventListener("click", () => {
-  if(results.length < emails.length){
-    if(!confirm("Result count is less than emails. Some emails will remain unassigned. Continue?")) return;
-  }
-  // clone results array and shuffle
-  const pool = results.slice();
-  // Fisher-Yates shuffle
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  assignments = {};
-  for (let i=0; i<emails.length; i++){
-    const e = emails[i];
-    assignments[e.toLowerCase()] = pool[i] ? pool[i] : null;
-  }
-  saveAssignmentsToStorage();
-  alert("Assignments generated and saved locally on this host.");
-});
-
-/* --------------------------
-  Admin: Export CSV (email,codename,gender,link)
----------------------------*/
-exportCSVBtn.addEventListener("click", () => {
-  const rows = [["email","codename","gender","link"]];
-  for (const e of Object.keys(assignments)){
-    const r = assignments[e] || { codeName:"", gender:"", link:"" };
-    rows.push([e, r.codeName || "", r.gender || "", r.link || ""]);
-  }
-  const csv = rows.map(r => r.map(cell => `"${String(cell||"").replace(/"/g,'""')}"`).join(",")).join("\n");
-  download("assignments.csv", csv);
-});
-
-/* --------------------------
-  Admin: Import CSV (expect columns: email,codename,gender,link)
----------------------------*/
-importCSVBtn.addEventListener("click", () => {
-  const txt = prompt("Paste CSV content (email,codename,gender,link). This will replace current assignments.");
-  if(!txt) return;
-  try {
-    const lines = txt.trim().split("\n").map(r => r.replace(/\r/g,""));
-    const header = lines.shift().split(",").map(h=>h.trim().toLowerCase());
-    const colIdx = {email: header.indexOf("email"), codename: header.indexOf("codename"), gender: header.indexOf("gender"), link: header.indexOf("link")};
-    const newAssign = {};
-    for (const ln of lines){
-      const cols = ln.split(",").map(c => c.replace(/^"|"$/g,'').trim());
-      const e = cols[colIdx.email] && cols[colIdx.email].toLowerCase();
-      if (!e) continue;
-      newAssign[e] = { codeName: cols[colIdx.codename]||"", gender: cols[colIdx.gender]||"", link: cols[colIdx.link]||"" };
+  spinBtn.addEventListener("click", ()=>{
+    const email = emailInput.value.trim().toLowerCase();
+    if(!email){
+      alert("⚠️ Please enter your email first.");
+      return;
     }
-    assignments = newAssign;
-    saveAssignmentsToStorage();
-    alert("Assignments imported.");
-  } catch (err){ alert("Failed to import CSV. Ensure format is correct."); }
-});
+    if(!validEmails.includes(email)){
+      resultText.textContent = "❌ Sorry! Your email is not registered.";
+      resultArea.style.display = "block";
+      return;
+    }
 
-/* --------------------------
-  Admin: Reset assignments
----------------------------*/
-resetAssignBtn.addEventListener("click", () => {
-  if(!confirm("Clear all assignments? This cannot be undone.")) return;
-  assignments = {};
-  saveAssignmentsToStorage();
-  alert("Assignments cleared.");
-});
+    if(!assigned[email]){
+      if(results.length===0){
+        resultText.textContent = "⚠️ All results have been assigned!";
+        resultArea.style.display = "block";
+        return;
+      }
+      const randomIndex = Math.floor(Math.random()*results.length);
+      const chosen = results.splice(randomIndex,1)[0];
+      assigned[email] = chosen;
+      localStorage.setItem("assignedRoulette", JSON.stringify(assigned));
+      localStorage.setItem("results", JSON.stringify(results));
+    }
 
-/* --------------------------
-  Visitor: Get result
----------------------------*/
-getResultBtn.addEventListener("click", () => {
-  const email = (visitorEmail.value || "").trim().toLowerCase();
-  if(!email){
-    resultContent.textContent = "⚠️ Please enter an email.";
-    return;
-  }
-  // Check allowed list
-  if(!emails.map(e=>e.toLowerCase()).includes(email)){
-    resultContent.textContent = "❌ Sorry — your email is not in the allowed list.";
-    return;
-  }
-
-  // If assignment exists show it
-  if(assignments[email]){
-    const r = assignments[email];
-    resultContent.innerHTML = `🎯 <strong>${escapeHtml(r.codeName)}</strong><br>👤 ${escapeHtml(r.gender)}${r.link?`<br>🔗 <a href="${escapeHtml(r.link)}" target="_blank">View link</a>`:""}`;
-    return;
-  }
-
-  // If no assignment yet, assign one if any results left unassigned
-  // Determine which results are still available
-  const assignedValues = Object.values(assignments).filter(Boolean).map(v => JSON.stringify(v));
-  const pool = results.filter(r => !assignedValues.includes(JSON.stringify(r)));
-  if(pool.length === 0){
-    resultContent.textContent = "⚠️ No more available results to assign.";
-    return;
-  }
-  const idx = Math.floor(Math.random() * pool.length);
-  const chosen = pool[idx];
-  assignments[email] = chosen;
-  saveAssignmentsToStorage();
-  resultContent.innerHTML = `🎯 <strong>${escapeHtml(chosen.codeName)}</strong><br>👤 ${escapeHtml(chosen.gender)}${chosen.link?`<br>🔗 <a href="${escapeHtml(chosen.link)}" target="_blank">View link</a>`:""}`;
-});
-
-/* --------------------------
-  Helper: escape HTML
----------------------------*/
-function escapeHtml(s){ return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
-
-/* Initialize UI with any existing assignments (optional) */
-(function initShow(){
-  // if visitor email field prefilled, try show assigned result
-  const v = (visitorEmail.value||"").trim().toLowerCase();
-  if (v && assignments[v]){
-    const r = assignments[v];
-    resultContent.innerHTML = `🎯 <strong>${escapeHtml(r.codeName)}</strong><br>👤 ${escapeHtml(r.gender)}`;
-  }
-})();
+    const chosen = assigned[email];
+    resultText.innerHTML = `🎯 <b>Codename:</b> ${chosen.codeName}<br>👤 <b>Gender:</b> ${chosen.gender}`;
+    resultArea.style.display = "block";
+    resultArea.style.animation = "fadeBounce 0.8s ease forwards";
+  });
 </script>
-
 </body>
 </html>
