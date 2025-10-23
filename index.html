@@ -6,8 +6,10 @@
 <title>The Haunted Spinner</title>
 <style>
 body {
-  margin:0; height:100vh; overflow:hidden; background:#000; color:#fff; font-family:'Courier New', monospace;
-  display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative;
+  margin:0; height:100vh; overflow:hidden; font-family:'Courier New', monospace;
+  background: url('https://images.unsplash.com/photo-1612202321020-4b4b0f63cfb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMTI5Mjl8MHwxfHNlYXJjaHwxfHxvZHxlbnwwfHx8fDE2OTgwNzE3OTc&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center fixed;
+  background-size: cover; position:relative; color:#fff;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
 }
 
 /* Ghostly Mist */
@@ -23,7 +25,11 @@ body {
 @keyframes fogMove2 { from {transform:translateX(10%) translateY(0%) scale(1.1);} to {transform:translateX(-10%) translateY(5%) scale(1.25);} }
 @keyframes fogMove3 { from {transform:translateX(-5%) translateY(5%) scale(1);} to {transform:translateX(5%) translateY(-5%) scale(1.2);} }
 
-.container { position:relative; z-index:2; text-align:center; }
+.container {
+  position:relative; z-index:2; text-align:center;
+  background:black; padding:30px; border-radius:15px; box-shadow:0 0 20px #000;
+  max-width:400px; width:90%;
+}
 h1 { margin-bottom:10px; font-size:2.2em; letter-spacing:2px; color:#ff6666; text-shadow:0 0 5px #ff0000,0 0 10px #ff4444; }
 p.intro { font-size:1.1em; color:#ddd; margin-bottom:20px; animation:fadeIn 3s ease; }
 input[type="email"], button { padding:10px; margin:10px; border:none; font-size:16px; border-radius:6px; }
@@ -85,14 +91,15 @@ button { cursor:pointer; transition: all 0.3s ease; }
   <button id="loginBtn">Login</button>
 
   <div id="adminContent" style="display:none; margin-top:10px;">
-    <p><b>Emails (comma-separated, old entries greyed out):</b></p>
+    <p><b>Emails (old entries greyed out):</b></p>
     <textarea id="emailList"></textarea>
-    <p><b>Results (one per line, matching emails, old entries greyed out):</b></p>
+    <p><b>Results (old entries greyed out):</b></p>
     <textarea id="resultList"></textarea>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:5px;">
       <button id="generateBtn">Generate Assignments</button>
       <button id="resetSpinBtn">Reset Spin</button>
       <button id="exportBtn">Export Results</button>
+      <button id="clearBtn">Clear Entries</button>
     </div>
   </div>
 </div>
@@ -112,6 +119,7 @@ const adminContent = document.getElementById('adminContent');
 const generateBtn = document.getElementById('generateBtn');
 const resetSpinBtn = document.getElementById('resetSpinBtn');
 const exportBtn = document.getElementById('exportBtn');
+const clearBtn = document.getElementById('clearBtn');
 
 const ADMIN_PASSWORD = 'escape2025';
 let assignments = {};
@@ -172,10 +180,7 @@ spinBtn.addEventListener('click', ()=>{
 });
 
 // Admin panel
-adminLink.addEventListener('click',()=>{
-  adminPanel.style.display='block';
-});
-
+adminLink.addEventListener('click',()=>{ adminPanel.style.display='block'; });
 closeAdmin.addEventListener('click',()=>adminPanel.style.display='none');
 
 loginBtn.addEventListener('click',()=>{
@@ -190,32 +195,25 @@ loginBtn.addEventListener('click',()=>{
     const emailListArea = document.getElementById('emailList');
     const resultListArea = document.getElementById('resultList');
 
-    // Build content: old entries readonly, new entries editable
+    // Build old entries
     let emailContent = '';
     let resultContent = '';
     for(let email in assignments){
         emailContent += email + ',';
         resultContent += assignments[email] + '\n';
     }
-    // add a blank line for new entries
-    emailContent += '\n';
-    resultContent += '\n';
+    emailContent += '\n'; resultContent += '\n';
     emailListArea.value = emailContent;
     resultListArea.value = resultContent;
 
-    // Old entries styled as grey
-    emailListArea.style.color = '#888';
-    emailListArea.style.fontStyle = 'italic';
-    resultListArea.style.color = '#888';
-    resultListArea.style.fontStyle = 'italic';
+    // Grey out old entries
+    emailListArea.style.color = '#888'; emailListArea.style.fontStyle='italic';
+    resultListArea.style.color = '#888'; resultListArea.style.fontStyle='italic';
 
-    // Make old lines uneditable using simple approach: prevent changes on initial lines
-    emailListArea.addEventListener('keydown', e=>{
-      if(emailListArea.selectionStart < emailContent.length-1) e.preventDefault();
-    });
-    resultListArea.addEventListener('keydown', e=>{
-      if(resultListArea.selectionStart < resultContent.length-1) e.preventDefault();
-    });
+    // Make old lines uneditable
+    emailListArea.addEventListener('keydown', e=>{ if(emailListArea.selectionStart < emailContent.length-1) e.preventDefault(); });
+    resultListArea.addEventListener('keydown', e=>{ if(resultListArea.selectionStart < resultContent.length-1) e.preventDefault(); });
+
   } else alert('Incorrect password!');
 });
 
@@ -226,10 +224,7 @@ generateBtn.addEventListener('click',()=>{
   const emailLines = emailRaw.split(/[\n,]+/).map(e=>normalizeEmail(e)).filter(e=>e);
   const resultLines = resultsRaw.split('\n').map(r=>r.trim()).filter(r=>r);
 
-  // Only add new entries (not overwriting existing)
-  emailLines.forEach((email,i)=>{
-    if(!(email in assignments) && resultLines[i]) assignments[email]=resultLines[i];
-  });
+  emailLines.forEach((email,i)=>{ if(!(email in assignments) && resultLines[i]) assignments[email]=resultLines[i]; });
   localStorage.setItem('hauntedSpinnerAssignments',JSON.stringify(assignments));
   alert(`Assignments saved! Total: ${Object.keys(assignments).length} entries.`);
 });
@@ -254,6 +249,21 @@ exportBtn.addEventListener('click',()=>{
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,"Results");
   XLSX.writeFile(wb,"HauntedSpinnerResults.xlsx");
+});
+
+// Clear all entries
+clearBtn.addEventListener('click', () => {
+  if(confirm("Are you sure you want to clear all entries? This cannot be undone.")) {
+    assignments = {};
+    localStorage.removeItem('hauntedSpinnerAssignments');
+    document.getElementById('emailList').value = '\n';
+    document.getElementById('resultList').value = '\n';
+    document.getElementById('emailList').style.color = '#000';
+    document.getElementById('emailList').style.fontStyle = 'normal';
+    document.getElementById('resultList').style.color = '#000';
+    document.getElementById('resultList').style.fontStyle = 'normal';
+    alert("All entries cleared. You can start a fresh new list!");
+  }
 });
 </script>
 
