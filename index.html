@@ -6,6 +6,8 @@
 <title>The Haunted Spinner</title>
 <style>
   body { margin:0; height:100vh; overflow:hidden; background:#000; color:#fff; font-family:'Courier New', monospace; display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; }
+  
+  /* Ghostly Mist */
   .mist, .mist::before, .mist::after { content:""; position:absolute; top:0; left:0; width:200%; height:200%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%), radial-gradient(circle at 70% 70%, rgba(255,255,255,0.1), transparent 70%); mix-blend-mode: lighten; opacity:0.25; animation:fogMove 40s linear infinite; pointer-events:none; }
   .mist::before { animation:fogMove2 60s linear infinite; opacity:0.3; }
   .mist::after { animation:fogMove3 90s linear infinite; opacity:0.2; }
@@ -21,6 +23,7 @@
   button { cursor:pointer; transition: all 0.3s ease; }
   #resultBox { display:none; color:#fff; padding:20px; border-radius:10px; margin-top:20px; animation:fadeIn 1s ease forwards; background-color:black; text-align:center; font-size:1.2em; font-weight:bold; }
   #warningNote { display:none; color:#ff6666; margin-top:10px; font-size:0.9em; text-shadow:0 0 5px #ff6666,0 0 10px #ff9999; animation:floatPulse 2s ease-in-out infinite; }
+
   @keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
   @keyframes floatPulse { 0% {opacity:0.6; transform:translateY(0);} 25% {opacity:1; transform:translateY(-2px);} 50% {opacity:0.6; transform:translateY(-4px);} 75% {opacity:1; transform:translateY(-2px);} 100% {opacity:0.6; transform:translateY(0);} }
 
@@ -33,13 +36,11 @@
   #adminPanel button { background-color:black; color:white; border:none; border-radius:4px; padding:6px 12px; }
   #adminPanel button:hover { background-color:#333; }
 
-  /* Spinning wheel */
-  #wheelContainer { width:250px; height:250px; margin:20px auto; border:5px solid #ff4444; border-radius:50%; position:relative; overflow:hidden; }
-  #wheel { width:100%; height:100%; border-radius:50%; border:8px dashed #ff6666; display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:1em; color:#fff; text-align:center; }
-  .spinningWheel { animation: spinWheel 2s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
-  @keyframes spinWheel { 0% { transform: rotate(0deg);} 100% { transform: rotate(1080deg);} }
+  /* Spinning emojis */
+  .emojiContainer { position:absolute; top:-60px; left:50%; transform:translateX(-50%); display:flex; gap:10px; font-size:2em; }
+  .emojiSpin { animation:spinEmojis 1.5s ease-in-out forwards; }
+  @keyframes spinEmojis { 0% { transform:translateY(0) rotate(0deg); opacity:1; } 50% { transform:translateY(-40px) rotate(360deg); opacity:1; } 100% { transform:translateY(-80px) rotate(720deg); opacity:0; } }
 
-  @media (max-width:420px){ input[type="email"]{ width:200px; } #adminPanel { width:92%; } #wheelContainer { width:200px; height:200px; } }
 </style>
 </head>
 <body>
@@ -58,7 +59,7 @@
   <input type="email" id="emailInput" placeholder="Enter your email..." />
   <button id="spinBtn">Spin</button>
 
-  <div id="wheelContainer"><div id="wheel">🎃</div></div>
+  <div id="emojiContainer" class="emojiContainer"></div>
 
   <div id="resultBox"></div>
   <p id="warningNote">⚠️ Make sure to copy or screenshot your result! It will disappear if you leave or refresh the page.</p>
@@ -85,15 +86,13 @@
   </div>
 </div>
 
-<!-- SheetJS library -->
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-
 <script>
 const spinBtn = document.getElementById('spinBtn');
 const emailInput = document.getElementById('emailInput');
 const resultBox = document.getElementById('resultBox');
 const warningNote = document.getElementById('warningNote');
-const wheel = document.getElementById('wheel');
+const emojiContainer = document.getElementById('emojiContainer');
 
 const adminLink = document.getElementById('adminLink');
 const adminPanel = document.getElementById('adminPanel');
@@ -116,77 +115,75 @@ window.addEventListener('load', () => {
 
 spinBtn.addEventListener('click', () => {
   const emailRaw = emailInput.value.trim();
-  if (!emailRaw) { alert('Please enter your email before spinning!'); return; }
+  if(!emailRaw){ alert('Please enter your email before spinning!'); return; }
   const emailKey = normalizeEmail(emailRaw);
 
-  wheel.classList.add('spinningWheel');
-  resultBox.style.display = 'none';
-  warningNote.style.display = 'none';
-
-  setTimeout(() => {
-    wheel.classList.remove('spinningWheel');
-    let result = assignments[emailKey] || "No assigned result for this email!";
-    resultBox.textContent = `The roulette has chosen: ${result}`;
-    resultBox.style.display = 'block';
-    warningNote.style.display = 'block';
-
-    emailInput.disabled = true;
-    spinBtn.disabled = true;
-    emailInput.style.opacity = 0.5;
-    spinBtn.style.opacity = 0.5;
-    spinBtn.style.cursor = 'not-allowed';
-  }, 2000);
-});
-
-adminLink.addEventListener('click', () => adminPanel.style.display = 'block');
-closeAdmin.addEventListener('click', () => adminPanel.style.display = 'none');
-
-loginBtn.addEventListener('click', () => {
-  const password = document.getElementById('adminPassword').value || '';
-  if (password === ADMIN_PASSWORD) {
-    adminContent.style.display = 'block';
-    alert('Admin login successful!');
-  } else {
-    alert('Incorrect password!');
-  }
-});
-
-generateBtn.addEventListener('click', () => {
-  const emailsRaw = document.getElementById('emailList').value;
-  const resultsRaw = document.getElementById('resultList').value;
-
-  const emails = emailsRaw.split(',').map(e => normalizeEmail(e)).filter(e => e);
-  const results = resultsRaw.split('\n').map(r => r.trim()).filter(r => r);
-
-  assignments = {};
-  emails.forEach((email, i) => {
-    if (results[i]) assignments[email] = results[i];
+  // Show spinning emojis
+  emojiContainer.innerHTML = '';
+  const emojis = ["🎃","👻","💀","🩸","🔪","🕷️","🦇"];
+  emojis.forEach(e => {
+    const span = document.createElement('span');
+    span.textContent = e;
+    span.classList.add('emojiSpin');
+    emojiContainer.appendChild(span);
   });
 
+  resultBox.style.display='none';
+  warningNote.style.display='none';
+
+  setTimeout(()=>{
+    emojiContainer.innerHTML = '';
+    let result = assignments[emailKey] || "No assigned result for this email!";
+    resultBox.textContent = `The roulette has chosen: ${result}`;
+    resultBox.style.display='block';
+    warningNote.style.display='block';
+
+    emailInput.disabled=true;
+    spinBtn.disabled=true;
+    emailInput.style.opacity=0.5;
+    spinBtn.style.opacity=0.5;
+    spinBtn.style.cursor='not-allowed';
+  },1500);
+});
+
+adminLink.addEventListener('click',()=>adminPanel.style.display='block');
+closeAdmin.addEventListener('click',()=>adminPanel.style.display='none');
+
+loginBtn.addEventListener('click',()=>{
+  const password=document.getElementById('adminPassword').value||'';
+  if(password===ADMIN_PASSWORD){ adminContent.style.display='block'; alert('Admin login successful!'); }
+  else alert('Incorrect password!');
+});
+
+generateBtn.addEventListener('click',()=>{
+  const emailsRaw=document.getElementById('emailList').value;
+  const resultsRaw=document.getElementById('resultList').value;
+  const emails=emailsRaw.split(',').map(e=>normalizeEmail(e)).filter(e=>e);
+  const results=resultsRaw.split('\n').map(r=>r.trim()).filter(r=>r);
+  assignments={};
+  emails.forEach((email,i)=>{ if(results[i]) assignments[email]=results[i]; });
   alert(`Assignments generated successfully! ${Object.keys(assignments).length} entries created.`);
 });
 
-resetSpinBtn.addEventListener('click', () => {
-  resultBox.style.display = 'none';
-  warningNote.style.display = 'none';
-  emailInput.value = '';
-  emailInput.disabled = false;
-  spinBtn.disabled = false;
-  emailInput.style.opacity = 1;
-  spinBtn.style.opacity = 1;
-  spinBtn.style.cursor = 'pointer';
+resetSpinBtn.addEventListener('click',()=>{
+  resultBox.style.display='none';
+  warningNote.style.display='none';
+  emailInput.value='';
+  emailInput.disabled=false;
+  spinBtn.disabled=false;
+  emailInput.style.opacity=1;
+  spinBtn.style.opacity=1;
+  spinBtn.style.cursor='pointer';
 });
 
 // EXPORT RESULTS
-exportBtn.addEventListener('click', () => {
-  const data = [["Email", "Result"]];
-  for (let email in assignments) {
-    data.push([email, assignments[email]]);
-  }
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Results");
-  XLSX.writeFile(wb, "HauntedSpinnerResults.xlsx");
+exportBtn.addEventListener('click',()=>{
+  const data=[["Email","Result"]];
+  for(let email in assignments){ data.push([email,assignments[email]]); }
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Results");
+  XLSX.writeFile(wb,"HauntedSpinnerResults.xlsx");
 });
 </script>
 
