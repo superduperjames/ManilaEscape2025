@@ -45,8 +45,7 @@
   p.intro { font-size: 1.1em; color: #ddd; margin-bottom: 20px; animation: fadeIn 3s ease; }
   input[type="email"], button { padding: 10px; margin: 10px; border: none; font-size: 16px; border-radius: 6px; }
   input[type="email"] { width: 260px; }
-  button { cursor: pointer; background: #fff; color: #000; transition: all 0.3s ease; }
-  button:hover { background: #ccc; }
+  button { cursor: pointer; transition: all 0.3s ease; }
   #resultBox { display: none; background: #fff; color: #000; padding: 20px; border-radius: 10px; margin-top: 20px; animation: fadeIn 1s ease forwards; }
 
   #warningNote {
@@ -69,6 +68,10 @@
   #closeAdmin { position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold; }
   #adminPanel input[type="password"] { width: calc(100% - 22px); padding:8px; margin-bottom:8px; box-sizing:border-box; }
 
+  /* Admin buttons black */
+  #adminPanel button { background-color:black; color:white; border:none; border-radius:4px; padding:6px 12px; }
+  #adminPanel button:hover { background-color:#333; }
+
   /* small responsive tweak */
   @media (max-width:420px){
     input[type="email"]{ width: 200px; }
@@ -80,7 +83,6 @@
 
 <div class="mist"></div>
 
-<!-- Soft eerie background sound -->
 <audio autoplay loop>
   <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_16a6a84e64.mp3?filename=whispers-ambient-14032.mp3" type="audio/mpeg">
 </audio>
@@ -89,7 +91,7 @@
 
 <div class="container">
   <h1>🎡 Spooky Roulette</h1>
-  <p class="intro">Enter if you dare… spin to reveal who you end up with.</p>
+  <p class="intro">Enter if you dare… spin to reveal your secret identity.</p>
   <input type="email" id="emailInput" placeholder="Enter your email..." />
   <button id="spinBtn">Spin</button>
 
@@ -97,7 +99,6 @@
   <p id="warningNote">⚠️ Make sure to copy or screenshot your result! It will disappear if you leave or refresh the page.</p>
 </div>
 
-<!-- Admin panel -->
 <div id="adminPanel">
   <span id="closeAdmin">✖</span>
   <h3>Admin Panel</h3>
@@ -106,10 +107,10 @@
 
   <div id="adminContent" style="display:none; margin-top:10px;">
     <p><b>Emails (comma-separated):</b></p>
-    <textarea id="emailList" placeholder="alice@example.com, bob@example.com, charlie@example.com"></textarea>
+    <textarea id="emailList"></textarea>
 
     <p><b>Results (one per line, matching emails):</b></p>
-    <textarea id="resultList" placeholder="🧛 Vampire\n🕷️ Spider\n👻 Ghost"></textarea>
+    <textarea id="resultList"></textarea>
 
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
       <button id="generateBtn">Generate Assignments</button>
@@ -119,126 +120,109 @@
 </div>
 
 <script>
-  const spinBtn = document.getElementById('spinBtn');
-  const emailInput = document.getElementById('emailInput');
-  const resultBox = document.getElementById('resultBox');
-  const warningNote = document.getElementById('warningNote');
+const spinBtn = document.getElementById('spinBtn');
+const emailInput = document.getElementById('emailInput');
+const resultBox = document.getElementById('resultBox');
+const warningNote = document.getElementById('warningNote');
 
-  const adminLink = document.getElementById('adminLink');
-  const adminPanel = document.getElementById('adminPanel');
-  const closeAdmin = document.getElementById('closeAdmin');
-  const loginBtn = document.getElementById('loginBtn');
-  const adminContent = document.getElementById('adminContent');
-  const generateBtn = document.getElementById('generateBtn');
-  const resetSpinBtn = document.getElementById('resetSpinBtn');
+const adminLink = document.getElementById('adminLink');
+const adminPanel = document.getElementById('adminPanel');
+const closeAdmin = document.getElementById('closeAdmin');
+const loginBtn = document.getElementById('loginBtn');
+const adminContent = document.getElementById('adminContent');
+const generateBtn = document.getElementById('generateBtn');
+const resetSpinBtn = document.getElementById('resetSpinBtn');
 
-  // UPDATED admin password
-  const ADMIN_PASSWORD = 'escape2025';
-  let assignments = {}; // { emailLower: result }
+const ADMIN_PASSWORD = 'escape2025';
+let assignments = {}; // { emailLower: result }
 
-  // Utility: normalize email keys (lowercase)
-  function normalizeEmail(e){ return (e || '').trim().toLowerCase(); }
+function normalizeEmail(e){ return (e || '').trim().toLowerCase(); }
 
-  // Load previous spin if exists
-  window.addEventListener('load', () => {
-    const storedResult = localStorage.getItem('spookyResult');
-    const storedEmail = localStorage.getItem('spookyEmail');
-    if (storedResult && storedEmail) {
-      resultBox.textContent = `You picked: ${storedResult}`;
-      resultBox.style.display = 'block';
-      warningNote.style.display = 'block';
-      emailInput.value = storedEmail;
-      emailInput.disabled = true;
-      spinBtn.disabled = true;
-      emailInput.style.opacity = 0.5;
-      spinBtn.style.opacity = 0.5;
-      spinBtn.style.cursor = 'not-allowed';
-    }
-  });
-
-  // Spin logic (uses assignments if present)
-  spinBtn.addEventListener('click', () => {
-    const emailRaw = emailInput.value.trim();
-    if (!emailRaw) {
-      alert('Please enter your email before spinning!');
-      return;
-    }
-    const emailKey = normalizeEmail(emailRaw);
-
-    let result = assignments[emailKey];
-    if (!result) {
-      // fallback message for unassigned emails
-      result = "No assigned result for this email!";
-    }
-
-    resultBox.textContent = `You picked: ${result}`;
+window.addEventListener('load', () => {
+  const storedResult = localStorage.getItem('spookyResult');
+  const storedEmail = localStorage.getItem('spookyEmail');
+  if (storedResult && storedEmail) {
+    resultBox.textContent = `The roulette has chosen: ${storedResult}`;
     resultBox.style.display = 'block';
     warningNote.style.display = 'block';
-
-    // disable input/button after spin
+    emailInput.value = storedEmail;
     emailInput.disabled = true;
     spinBtn.disabled = true;
     emailInput.style.opacity = 0.5;
     spinBtn.style.opacity = 0.5;
     spinBtn.style.cursor = 'not-allowed';
+  }
+});
 
-    // persist
-    localStorage.setItem('spookyResult', result);
-    localStorage.setItem('spookyEmail', emailRaw);
+spinBtn.addEventListener('click', () => {
+  const emailRaw = emailInput.value.trim();
+  if (!emailRaw) {
+    alert('Please enter your email before spinning!');
+    return;
+  }
+  const emailKey = normalizeEmail(emailRaw);
+
+  let result = assignments[emailKey];
+  if (!result) {
+    result = "No assigned result for this email!";
+  }
+
+  resultBox.textContent = `The roulette has chosen: ${result}`;
+  resultBox.style.display = 'block';
+  warningNote.style.display = 'block';
+
+  emailInput.disabled = true;
+  spinBtn.disabled = true;
+  emailInput.style.opacity = 0.5;
+  spinBtn.style.opacity = 0.5;
+  spinBtn.style.cursor = 'not-allowed';
+
+  localStorage.setItem('spookyResult', result);
+  localStorage.setItem('spookyEmail', emailRaw);
+});
+
+adminLink.addEventListener('click', () => adminPanel.style.display = 'block');
+closeAdmin.addEventListener('click', () => adminPanel.style.display = 'none');
+
+loginBtn.addEventListener('click', () => {
+  const password = document.getElementById('adminPassword').value || '';
+  if (password === ADMIN_PASSWORD) {
+    adminContent.style.display = 'block';
+    alert('Admin login successful!');
+  } else {
+    alert('Incorrect password!');
+  }
+});
+
+generateBtn.addEventListener('click', () => {
+  const emailsRaw = document.getElementById('emailList').value;
+  const resultsRaw = document.getElementById('resultList').value;
+
+  const emails = emailsRaw.split(',').map(e => normalizeEmail(e)).filter(e => e);
+  const results = resultsRaw.split('\n').map(r => r.trim()).filter(r => r);
+
+  assignments = {};
+  emails.forEach((email, i) => {
+    if (results[i]) assignments[email] = results[i];
   });
 
-  // Admin UI toggles
-  adminLink.addEventListener('click', () => adminPanel.style.display = 'block');
-  closeAdmin.addEventListener('click', () => adminPanel.style.display = 'none');
+  alert('Assignments generated successfully!\n' +
+        `${Object.keys(assignments).length} assignments created.`);
+});
 
-  // Admin login
-  loginBtn.addEventListener('click', () => {
-    const password = document.getElementById('adminPassword').value || '';
-    if (password === ADMIN_PASSWORD) {
-      adminContent.style.display = 'block';
-      alert('Admin login successful!');
-    } else {
-      alert('Incorrect password!');
-    }
-  });
-
-  // Generate assignments from admin input
-  generateBtn.addEventListener('click', () => {
-    const emailsRaw = document.getElementById('emailList').value;
-    const resultsRaw = document.getElementById('resultList').value;
-
-    const emails = emailsRaw.split(',').map(e => normalizeEmail(e)).filter(e => e);
-    const results = resultsRaw.split('\n').map(r => r.trim()).filter(r => r);
-
-    assignments = {};
-    emails.forEach((email, i) => {
-      if (results[i]) assignments[email] = results[i];
-    });
-
-    // If fewer results than emails -> leftover emails get "No assigned result..."
-    alert('Assignments generated successfully!\n\n' +
-          `${Object.keys(assignments).length} assignments created.`);
-  });
-
-  // Reset spin for testing (admin)
-  resetSpinBtn.addEventListener('click', () => {
-    localStorage.removeItem('spookyResult');
-    localStorage.removeItem('spookyEmail');
-    resultBox.style.display = 'none';
-    warningNote.style.display = 'none';
-    emailInput.value = '';
-    emailInput.disabled = false;
-    spinBtn.disabled = false;
-    emailInput.style.opacity = 1;
-    spinBtn.style.opacity = 1;
-    spinBtn.style.cursor = 'pointer';
-    alert('Spin has been reset. Users can spin again.');
-  });
-
-  // Optional: close admin panel when clicking outside it
-  window.addEventListener('click', (e) => {
-    if (e.target === adminPanel) adminPanel.style.display = 'none';
-  });
+resetSpinBtn.addEventListener('click', () => {
+  localStorage.removeItem('spookyResult');
+  localStorage.removeItem('spookyEmail');
+  resultBox.style.display = 'none';
+  warningNote.style.display = 'none';
+  emailInput.value = '';
+  emailInput.disabled = false;
+  spinBtn.disabled = false;
+  emailInput.style.opacity = 1;
+  spinBtn.style.opacity = 1;
+  spinBtn.style.cursor = 'pointer';
+  alert('Spin has been reset. Users can spin again.');
+});
 </script>
 
 </body>
