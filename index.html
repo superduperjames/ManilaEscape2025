@@ -258,4 +258,19 @@
 </script>
 
 </body>
+  <script>
+  function sendHeight() {
+    const contentHeight = document.documentElement.scrollHeight;
+    const minHeight = window.innerHeight; // ensure at least viewport height
+    const finalHeight = Math.max(contentHeight, minHeight);
+    window.parent.postMessage(finalHeight, "https://your-parent-site.com"); // replace with your parent origin
+  }
+
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
+
+  // Observe dynamic content changes
+  const observer = new MutationObserver(sendHeight);
+  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+</script>
 </html>
