@@ -5,42 +5,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spooky Roulette</title>
 <style>
-  /* --- Base Styles --- */
   body {
     margin: 0;
     height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
     background: #000;
     color: #fff;
     font-family: 'Courier New', monospace;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     position: relative;
   }
 
-  /* Rolling Mist */
-  body::before, body::after {
+  /* --- Ghostly Mist --- */
+  .mist, .mist::before, .mist::after {
     content: "";
     position: absolute;
     top: 0; left: 0;
-    width: 200%; height: 200%;
-    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1), transparent 60%),
-                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05), transparent 70%);
-    animation: mist 30s linear infinite alternate;
-    z-index: 0;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%),
+                radial-gradient(circle at 70% 70%, rgba(255,255,255,0.1), transparent 70%);
+    mix-blend-mode: lighten;
+    opacity: 0.25;
+    animation: fogMove 40s linear infinite;
+    pointer-events: none;
   }
-  @keyframes mist {
-    from { transform: translate(-10%, -10%) scale(1); }
-    to { transform: translate(10%, 10%) scale(1.2); }
+  .mist::before {
+    animation: fogMove2 60s linear infinite;
+    opacity: 0.3;
+  }
+  .mist::after {
+    animation: fogMove3 90s linear infinite;
+    opacity: 0.2;
   }
 
-  /* --- Main Container --- */
+  @keyframes fogMove {
+    from { transform: translateX(-10%) translateY(-10%) scale(1.2); }
+    to { transform: translateX(10%) translateY(10%) scale(1.3); }
+  }
+  @keyframes fogMove2 {
+    from { transform: translateX(10%) translateY(0%) scale(1.1); }
+    to { transform: translateX(-10%) translateY(5%) scale(1.25); }
+  }
+  @keyframes fogMove3 {
+    from { transform: translateX(-5%) translateY(5%) scale(1); }
+    to { transform: translateX(5%) translateY(-5%) scale(1.2); }
+  }
+
   .container {
     position: relative;
     z-index: 2;
     text-align: center;
+  }
+
+  h1 {
+    margin-bottom: 10px;
+    font-size: 2em;
+    letter-spacing: 2px;
+  }
+
+  p.intro {
+    font-size: 1.1em;
+    color: #ddd;
+    margin-bottom: 20px;
+    animation: fadeIn 3s ease;
   }
 
   input[type="email"], button {
@@ -52,7 +83,7 @@
   }
 
   input[type="email"] {
-    width: 250px;
+    width: 260px;
   }
 
   button {
@@ -66,7 +97,6 @@
     background: #ccc;
   }
 
-  /* Result Box */
   #resultBox {
     display: none;
     background: #fff;
@@ -82,7 +112,7 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* --- Admin Link (top right) --- */
+  /* Admin link */
   #adminLink {
     position: fixed;
     top: 10px;
@@ -98,7 +128,7 @@
     text-decoration: underline;
   }
 
-  /* --- Admin Panel --- */
+  /* Admin panel */
   #adminPanel {
     display: none;
     position: fixed;
@@ -130,16 +160,24 @@
 </head>
 <body>
 
+<div class="mist"></div>
+
+<!-- Soft eerie background sound -->
+<audio autoplay loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_16a6a84e64.mp3?filename=whispers-ambient-14032.mp3" type="audio/mpeg">
+</audio>
+
 <div id="adminLink">👻 Admin Login</div>
 
 <div class="container">
   <h1>🎡 Spooky Roulette</h1>
+  <p class="intro">Enter if you dare… spin to reveal your secret identity.</p>
   <input type="email" id="emailInput" placeholder="Enter your email...">
   <button id="spinBtn">Spin</button>
   <div id="resultBox"></div>
 </div>
 
-<!-- Admin Panel -->
+<!-- Admin panel -->
 <div id="adminPanel">
   <span id="closeAdmin">✖</span>
   <h3>Admin Panel</h3>
@@ -149,7 +187,7 @@
   <div id="adminContent" style="display:none;">
     <p><b>Emails (comma-separated):</b></p>
     <textarea id="emailList"></textarea>
-    <p><b>Results (codename, gender — comma-separated):</b></p>
+    <p><b>Results (codename, gender — one per line):</b></p>
     <textarea id="resultList"></textarea>
     <button id="generateBtn">Generate Assignments</button>
     <button id="resetBtn">Reset</button>
@@ -174,11 +212,9 @@
   let emails = [];
   let results = [];
 
-  // Admin open/close
   adminLink.onclick = () => adminPanel.style.display = 'block';
   closeAdmin.onclick = () => adminPanel.style.display = 'none';
 
-  // Login
   loginBtn.onclick = () => {
     if (document.getElementById('adminPassword').value === 'escape2025') {
       adminContent.style.display = 'block';
@@ -187,7 +223,6 @@
     }
   };
 
-  // Generate assignments
   generateBtn.onclick = () => {
     emails = emailList.value.split(',').map(e => e.trim()).filter(Boolean);
     results = resultList.value.split('\n').map(r => r.trim()).filter(Boolean);
@@ -200,14 +235,12 @@
     alert("Assignments generated!");
   };
 
-  // Reset
   resetBtn.onclick = () => {
     localStorage.removeItem("assignments");
     assignments = {};
     alert("Assignments reset!");
   };
 
-  // Spin
   spinBtn.onclick = () => {
     const email = emailInput.value.trim();
     if (!email) {
@@ -215,11 +248,10 @@
       return;
     }
     const result = assignments[email];
+    resultBox.style.display = 'block';
     if (result) {
-      resultBox.style.display = 'block';
       resultBox.innerHTML = `<strong>🎃 Result:</strong> ${result}`;
     } else {
-      resultBox.style.display = 'block';
       resultBox.innerHTML = `<strong>👻 Sorry!</strong> This email has no assigned result.`;
     }
   };
