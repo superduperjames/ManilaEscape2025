@@ -46,9 +46,9 @@ button { cursor:pointer; transition: all 0.3s ease; }
 #adminLink { position:fixed; top:10px; right:20px; color:white; cursor:pointer; font-size:14px; opacity:0.7; z-index:3; }
 #adminLink:hover { opacity:1; text-decoration:underline; }
 #adminPanel { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-  background: rgba(255,255,255,0.95); color:#000; padding:20px; border-radius:10px; z-index:4; width:320px; max-width:90%;
+  background: rgba(255,255,255,0.95); color:#000; padding:20px; border-radius:10px; z-index:4; width:360px; max-width:90%;
 }
-#adminPanel textarea { width:100%; height:80px; margin-bottom:10px; box-sizing:border-box; }
+#adminPanel textarea { width:100%; height:100px; margin-bottom:10px; box-sizing:border-box; }
 #closeAdmin { position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold; }
 #adminPanel input[type="password"] { width: calc(100% - 22px); padding:8px; margin-bottom:8px; box-sizing:border-box; }
 #adminPanel button { background-color:black; color:white; border:none; border-radius:4px; padding:6px 12px; }
@@ -85,9 +85,9 @@ button { cursor:pointer; transition: all 0.3s ease; }
   <button id="loginBtn">Login</button>
 
   <div id="adminContent" style="display:none; margin-top:10px;">
-    <p><b>Emails (comma-separated):</b></p>
+    <p><b>Emails (comma-separated, old entries greyed out):</b></p>
     <textarea id="emailList"></textarea>
-    <p><b>Results (one per line, matching emails):</b></p>
+    <p><b>Results (one per line, matching emails, old entries greyed out):</b></p>
     <textarea id="resultList"></textarea>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:5px;">
       <button id="generateBtn">Generate Assignments</button>
@@ -131,25 +131,17 @@ function spawnEmojis() {
     const span = document.createElement('span');
     span.className='emoji';
     span.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-
-    // Random position
     span.style.top = Math.random()*window.innerHeight + 'px';
     span.style.left = Math.random()*window.innerWidth + 'px';
-
-    // Random size
-    const size = 20 + Math.random()*40; // 20px to 60px
+    const size = 20 + Math.random()*40; 
     span.style.fontSize = size + 'px';
-
-    // random rotation and speed
     const direction = Math.random() < 0.5 ? 1 : -1;
-    const duration = 1 + Math.random()*1.5; // 1s to 2.5s
-
+    const duration = 1 + Math.random()*1.5;
     span.animate([
       { transform: 'rotate(0deg) scale(1)', opacity:1 },
       { transform: `rotate(${direction*360}deg) scale(1.2)`, opacity:1, offset:0.5 },
       { transform: `rotate(${direction*720}deg) scale(0.8)`, opacity:0 }
     ], { duration: duration*1000, easing: 'ease-in-out' });
-
     document.body.appendChild(span);
     setTimeout(()=>span.remove(), duration*1000);
   }
@@ -180,25 +172,66 @@ spinBtn.addEventListener('click', ()=>{
 });
 
 // Admin panel
-adminLink.addEventListener('click',()=>adminPanel.style.display='block');
+adminLink.addEventListener('click',()=>{
+  adminPanel.style.display='block';
+});
+
 closeAdmin.addEventListener('click',()=>adminPanel.style.display='none');
+
 loginBtn.addEventListener('click',()=>{
   const password=document.getElementById('adminPassword').value||'';
-  if(password===ADMIN_PASSWORD){ adminContent.style.display='block'; alert('Admin login successful!'); }
-  else alert('Incorrect password!');
+  if(password===ADMIN_PASSWORD){
+    adminContent.style.display='block';
+    alert('Admin login successful!');
+
+    const stored = localStorage.getItem('hauntedSpinnerAssignments');
+    assignments = stored ? JSON.parse(stored) : {};
+
+    const emailListArea = document.getElementById('emailList');
+    const resultListArea = document.getElementById('resultList');
+
+    // Build content: old entries readonly, new entries editable
+    let emailContent = '';
+    let resultContent = '';
+    for(let email in assignments){
+        emailContent += email + ',';
+        resultContent += assignments[email] + '\n';
+    }
+    // add a blank line for new entries
+    emailContent += '\n';
+    resultContent += '\n';
+    emailListArea.value = emailContent;
+    resultListArea.value = resultContent;
+
+    // Old entries styled as grey
+    emailListArea.style.color = '#888';
+    emailListArea.style.fontStyle = 'italic';
+    resultListArea.style.color = '#888';
+    resultListArea.style.fontStyle = 'italic';
+
+    // Make old lines uneditable using simple approach: prevent changes on initial lines
+    emailListArea.addEventListener('keydown', e=>{
+      if(emailListArea.selectionStart < emailContent.length-1) e.preventDefault();
+    });
+    resultListArea.addEventListener('keydown', e=>{
+      if(resultListArea.selectionStart < resultContent.length-1) e.preventDefault();
+    });
+  } else alert('Incorrect password!');
 });
 
 // generate assignments
 generateBtn.addEventListener('click',()=>{
-  const emailsRaw=document.getElementById('emailList').value;
-  const resultsRaw=document.getElementById('resultList').value;
-  const emails=emailsRaw.split(',').map(e=>normalizeEmail(e)).filter(e=>e);
-  const results=resultsRaw.split('\n').map(r=>r.trim()).filter(r=>r);
-  emails.forEach((email,i)=>{ if(results[i]) assignments[email]=results[i]; });
+  const emailRaw = document.getElementById('emailList').value;
+  const resultsRaw = document.getElementById('resultList').value;
+  const emailLines = emailRaw.split(/[\n,]+/).map(e=>normalizeEmail(e)).filter(e=>e);
+  const resultLines = resultsRaw.split('\n').map(r=>r.trim()).filter(r=>r);
+
+  // Only add new entries (not overwriting existing)
+  emailLines.forEach((email,i)=>{
+    if(!(email in assignments) && resultLines[i]) assignments[email]=resultLines[i];
+  });
   localStorage.setItem('hauntedSpinnerAssignments',JSON.stringify(assignments));
   alert(`Assignments saved! Total: ${Object.keys(assignments).length} entries.`);
-  document.getElementById('emailList').value='';
-  document.getElementById('resultList').value='';
 });
 
 // reset spin
@@ -216,9 +249,7 @@ resetSpinBtn.addEventListener('click',()=>{
 // Export Results
 exportBtn.addEventListener('click',()=>{
   const data=[["Email","Result"]];
-  const stored=localStorage.getItem('hauntedSpinnerAssignments');
-  const allAssignments=stored?JSON.parse(stored):{};
-  for(let email in allAssignments){ data.push([email,allAssignments[email]]); }
+  for(let email in assignments){ data.push([email,assignments[email]]); }
   const ws=XLSX.utils.aoa_to_sheet(data);
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,"Results");
