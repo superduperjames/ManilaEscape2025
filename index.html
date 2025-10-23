@@ -107,9 +107,27 @@
     animation: fadeIn 1s ease forwards;
   }
 
+  /* Warning note */
+  #warningNote {
+    display: none;
+    color: #ff6666;
+    margin-top: 10px;
+    font-size: 0.9em;
+    text-shadow: 0 0 5px #ff6666, 0 0 10px #ff9999;
+    animation: floatPulse 2s ease-in-out infinite;
+  }
+
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes floatPulse {
+    0% { opacity: 0.6; transform: translateY(0px); }
+    25% { opacity: 1; transform: translateY(-2px); }
+    50% { opacity: 0.6; transform: translateY(-4px); }
+    75% { opacity: 1; transform: translateY(-2px); }
+    100% { opacity: 0.6; transform: translateY(0px); }
   }
 
   /* Admin link */
@@ -175,6 +193,9 @@
   <input type="email" id="emailInput" placeholder="Enter your email...">
   <button id="spinBtn">Spin</button>
   <div id="resultBox"></div>
+  <p id="warningNote">
+    ⚠️ Make sure to copy or screenshot your result! It will disappear if you leave or refresh the page.
+  </p>
 </div>
 
 <!-- Admin panel -->
@@ -190,87 +211,104 @@
     <p><b>Results (codename, gender — one per line):</b></p>
     <textarea id="resultList"></textarea>
     <button id="generateBtn">Generate Assignments</button>
-    <button id="resetBtn">Reset</button>
+    <!-- Admin Reset Spin button -->
+    <button id="resetSpinBtn">Reset Spin</button>
   </div>
 </div>
 
 <script>
+  const spinBtn = document.getElementById('spinBtn');
+  const emailInput = document.getElementById('emailInput');
+  const resultBox = document.getElementById('resultBox');
+  const warningNote = document.getElementById('warningNote');
+
   const adminLink = document.getElementById('adminLink');
   const adminPanel = document.getElementById('adminPanel');
   const closeAdmin = document.getElementById('closeAdmin');
   const loginBtn = document.getElementById('loginBtn');
   const adminContent = document.getElementById('adminContent');
-  const emailList = document.getElementById('emailList');
-  const resultList = document.getElementById('resultList');
-  const generateBtn = document.getElementById('generateBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const spinBtn = document.getElementById('spinBtn');
-  const resultBox = document.getElementById('resultBox');
-  const emailInput = document.getElementById('emailInput');
+  const resetSpinBtn = document.getElementById('resetSpinBtn');
 
-  let assignments = JSON.parse(localStorage.getItem("assignments")) || {};
-  let emails = [];
-  let results = [];
+  // Example admin password
+  const ADMIN_PASSWORD = "spooky123";
 
-  adminLink.onclick = () => adminPanel.style.display = 'block';
-  closeAdmin.onclick = () => adminPanel.style.display = 'none';
+  // Check localStorage on load
+  window.addEventListener('load', () => {
+    const storedResult = localStorage.getItem('spookyResult');
+    const storedEmail = localStorage.getItem('spookyEmail');
 
-  loginBtn.onclick = () => {
-    if (document.getElementById('adminPassword').value === 'escape2025') {
-      adminContent.style.display = 'block';
-    } else {
-      alert("Wrong password!");
+    if (storedResult && storedEmail) {
+      resultBox.textContent = `Your spooky identity is: ${storedResult}`;
+      resultBox.style.display = 'block';
+      warningNote.style.display = 'block';
+      emailInput.value = storedEmail;
+      emailInput.disabled = true;
+      spinBtn.disabled = true;
+      emailInput.style.opacity = 0.5;
+      spinBtn.style.opacity = 0.5;
+      spinBtn.style.cursor = 'not-allowed';
     }
-  };
+  });
 
-  generateBtn.onclick = () => {
-    emails = emailList.value.split(',').map(e => e.trim()).filter(Boolean);
-    results = resultList.value.split('\n').map(r => r.trim()).filter(Boolean);
-    assignments = {};
-    emails.forEach(e => {
-      const randomResult = results[Math.floor(Math.random() * results.length)];
-      assignments[e] = randomResult;
-    });
-    localStorage.setItem("assignments", JSON.stringify(assignments));
-    alert("Assignments generated!");
-  };
-
-  resetBtn.onclick = () => {
-    localStorage.removeItem("assignments");
-    assignments = {};
-    alert("Assignments reset!");
-  };
-
-  spinBtn.onclick = () => {
+  // Spin button click
+  spinBtn.addEventListener('click', () => {
     const email = emailInput.value.trim();
     if (!email) {
-      alert("Please enter an email!");
+      alert('Please enter your email before spinning!');
       return;
     }
-    const result = assignments[email];
+
+    const results = ["👻 Ghost", "🕷️ Spider", "🧛 Vampire", "🧟 Zombie"];
+    const randomResult = results[Math.floor(Math.random() * results.length)];
+
+    resultBox.textContent = `Your spooky identity is: ${randomResult}`;
     resultBox.style.display = 'block';
-    if (result) {
-      resultBox.innerHTML = `<strong>🎃 Result:</strong> ${result}`;
+    warningNote.style.display = 'block';
+
+    emailInput.disabled = true;
+    spinBtn.disabled = true;
+    emailInput.style.opacity = 0.5;
+    spinBtn.style.opacity = 0.5;
+    spinBtn.style.cursor = 'not-allowed';
+
+    localStorage.setItem('spookyResult', randomResult);
+    localStorage.setItem('spookyEmail', email);
+  });
+
+  // Admin login
+  adminLink.addEventListener('click', () => {
+    adminPanel.style.display = 'block';
+  });
+
+  closeAdmin.addEventListener('click', () => {
+    adminPanel.style.display = 'none';
+  });
+
+  loginBtn.addEventListener('click', () => {
+    const password = document.getElementById('adminPassword').value;
+    if (password === ADMIN_PASSWORD) {
+      adminContent.style.display = 'block';
+      alert("Admin login successful!");
     } else {
-      resultBox.innerHTML = `<strong>👻 Sorry!</strong> This email has no assigned result.`;
+      alert("Incorrect password!");
     }
-  };
+  });
+
+  // Admin Reset Spin button
+  resetSpinBtn.addEventListener('click', () => {
+    localStorage.removeItem('spookyResult');
+    localStorage.removeItem('spookyEmail');
+    resultBox.style.display = 'none';
+    warningNote.style.display = 'none';
+    emailInput.value = '';
+    emailInput.disabled = false;
+    spinBtn.disabled = false;
+    emailInput.style.opacity = 1;
+    spinBtn.style.opacity = 1;
+    spinBtn.style.cursor = 'pointer';
+    alert("Spin has been reset. Users can spin again.");
+  });
 </script>
 
 </body>
-  <script>
-  function sendHeight() {
-    const contentHeight = document.documentElement.scrollHeight;
-    const minHeight = window.innerHeight; // ensure at least viewport height
-    const finalHeight = Math.max(contentHeight, minHeight);
-    window.parent.postMessage(finalHeight, "https://your-parent-site.com"); // replace with your parent origin
-  }
-
-  window.addEventListener("load", sendHeight);
-  window.addEventListener("resize", sendHeight);
-
-  // Observe dynamic content changes
-  const observer = new MutationObserver(sendHeight);
-  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-</script>
 </html>
