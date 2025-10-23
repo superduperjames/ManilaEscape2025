@@ -46,7 +46,7 @@
   input[type="email"], button { padding: 10px; margin: 10px; border: none; font-size: 16px; border-radius: 6px; }
   input[type="email"] { width: 260px; }
   button { cursor: pointer; transition: all 0.3s ease; }
-  #resultBox { display: none; background: #fff; color: #000; padding: 20px; border-radius: 10px; margin-top: 20px; animation: fadeIn 1s ease forwards; }
+  #resultBox { display: none; color: #fff; padding: 20px; border-radius: 10px; margin-top: 20px; animation: fadeIn 1s ease forwards; background-color: black; text-align:center; }
 
   #warningNote {
     display: none;
@@ -91,7 +91,7 @@
 
 <div class="container">
   <h1>🎡 Spooky Roulette</h1>
-  <p class="intro">Enter if you dare… spin to reveal your secret identity.</p>
+  <p class="intro">Spin! Spin! Spin! Click here to reveal who the roulette has chosen for you...</p>
   <input type="email" id="emailInput" placeholder="Enter your email..." />
   <button id="spinBtn">Spin</button>
 
@@ -134,14 +134,19 @@ const generateBtn = document.getElementById('generateBtn');
 const resetSpinBtn = document.getElementById('resetSpinBtn');
 
 const ADMIN_PASSWORD = 'escape2025';
-let assignments = {}; // { emailLower: result }
+let assignments = {};
 
 function normalizeEmail(e){ return (e || '').trim().toLowerCase(); }
 
 window.addEventListener('load', () => {
   const storedResult = localStorage.getItem('spookyResult');
   const storedEmail = localStorage.getItem('spookyEmail');
-  if (storedResult && storedEmail) {
+
+  // Show "Top Secret Information!" on page refresh if user hasn't spun
+  if(!storedResult || !storedEmail){
+    resultBox.textContent = "Top Secret Information!";
+    resultBox.style.display = 'block';
+  } else {
     resultBox.textContent = `The roulette has chosen: ${storedResult}`;
     resultBox.style.display = 'block';
     warningNote.style.display = 'block';
@@ -156,16 +161,10 @@ window.addEventListener('load', () => {
 
 spinBtn.addEventListener('click', () => {
   const emailRaw = emailInput.value.trim();
-  if (!emailRaw) {
-    alert('Please enter your email before spinning!');
-    return;
-  }
+  if (!emailRaw) { alert('Please enter your email before spinning!'); return; }
   const emailKey = normalizeEmail(emailRaw);
 
-  let result = assignments[emailKey];
-  if (!result) {
-    result = "No assigned result for this email!";
-  }
+  let result = assignments[emailKey] || "No assigned result for this email!";
 
   resultBox.textContent = `The roulette has chosen: ${result}`;
   resultBox.style.display = 'block';
@@ -213,7 +212,7 @@ generateBtn.addEventListener('click', () => {
 resetSpinBtn.addEventListener('click', () => {
   localStorage.removeItem('spookyResult');
   localStorage.removeItem('spookyEmail');
-  resultBox.style.display = 'none';
+  resultBox.textContent = "Top Secret Information!";
   warningNote.style.display = 'none';
   emailInput.value = '';
   emailInput.disabled = false;
