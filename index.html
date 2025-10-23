@@ -72,7 +72,6 @@
   #adminPanel button { background-color:black; color:white; border:none; border-radius:4px; padding:6px 12px; }
   #adminPanel button:hover { background-color:#333; }
 
-  /* small responsive tweak */
   @media (max-width:420px){
     input[type="email"]{ width: 200px; }
     #adminPanel { width: 92%; }
@@ -142,11 +141,7 @@ window.addEventListener('load', () => {
   const storedResult = localStorage.getItem('spookyResult');
   const storedEmail = localStorage.getItem('spookyEmail');
 
-  // Show "Top Secret Information!" on page refresh if user hasn't spun
-  if(!storedResult || !storedEmail){
-    resultBox.textContent = "Top Secret Information!";
-    resultBox.style.display = 'block';
-  } else {
+  if(storedResult && storedEmail){
     resultBox.textContent = `The roulette has chosen: ${storedResult}`;
     resultBox.style.display = 'block';
     warningNote.style.display = 'block';
@@ -156,6 +151,9 @@ window.addEventListener('load', () => {
     emailInput.style.opacity = 0.5;
     spinBtn.style.opacity = 0.5;
     spinBtn.style.cursor = 'not-allowed';
+  } else {
+    // Hide results box completely until spin
+    resultBox.style.display = 'none';
   }
 });
 
@@ -212,7 +210,7 @@ generateBtn.addEventListener('click', () => {
 resetSpinBtn.addEventListener('click', () => {
   localStorage.removeItem('spookyResult');
   localStorage.removeItem('spookyEmail');
-  resultBox.textContent = "Top Secret Information!";
+  resultBox.style.display = 'none';
   warningNote.style.display = 'none';
   emailInput.value = '';
   emailInput.disabled = false;
