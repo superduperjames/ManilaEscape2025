@@ -26,7 +26,7 @@
       color: #ddd;
     }
 
-    input[type="email"] {
+    input[type="email"], textarea {
       padding: 10px;
       font-size: 1em;
       border-radius: 8px;
@@ -34,6 +34,12 @@
       outline: none;
       width: 260px;
       margin-top: 10px;
+    }
+
+    textarea {
+      width: 320px;
+      height: 100px;
+      resize: none;
     }
 
     button {
@@ -108,6 +114,13 @@
       color: #fff;
     }
 
+    label {
+      display: block;
+      margin-top: 15px;
+      font-size: 1em;
+      color: #ccc;
+    }
+
     /* Modal confirmation */
     .modal {
       display: none;
@@ -151,6 +164,13 @@
   <div id="adminPanel">
     <span id="closeAdmin">✕ Close</span>
     <h2>Admin Controls</h2>
+
+    <label for="emailList">Emails (comma-separated):</label>
+    <textarea id="emailList" placeholder="email1@example.com, email2@example.com"></textarea>
+
+    <label for="codeList">Codenames and Gender (comma-separated):</label>
+    <textarea id="codeList" placeholder="Phantom (M), Witch (F), Ghost (M)"></textarea>
+
     <button onclick="generateAssignments()">Generate Assignments</button>
     <button onclick="openModal('reshuffleConfirm')">Reshuffle</button>
     <button onclick="openModal('clearConfirm')">Clear Entries</button>
@@ -228,11 +248,20 @@
 
     // 👻 Admin Actions
     function generateAssignments() {
+      const emails = document.getElementById("emailList").value.trim();
+      const codes = document.getElementById("codeList").value.trim();
+
+      if (!emails || !codes) {
+        alert("Please fill in both Emails and Codenames + Gender fields.");
+        return;
+      }
+
       fetch(SCRIPT_URL, {
         method: "POST",
-        body: JSON.stringify({ type: "generateAssignments" }),
+        body: JSON.stringify({ type: "generateAssignments", emails, codes }),
         headers: { "Content-Type": "application/json" },
-      }).then(() => alert("Assignments generated successfully!"));
+      })
+      .then(() => alert("Assignments generated successfully!"));
     }
 
     function reshuffle() {
