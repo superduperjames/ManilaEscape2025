@@ -1,285 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ghoul Swap 2025 👻</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ghoul Swap 2025 🎃</title>
   <style>
     body {
-      margin: 0;
+      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759502727/_James%20Assets/.test%20app%20assets/MML%20October%202025/218016_small-ezgif.com-video-to-gif-converter.gif') center/cover no-repeat fixed;
+      color: #fff;
       font-family: 'Cinzel', serif;
-      color: #f8f8f8;
-      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759502727/_James%20Assets/.test%20app%20assets/MML%20October%202025/218016_small-ezgif.com-video-to-gif-converter.gif') no-repeat center center fixed;
-      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       text-align: center;
-      overflow-x: hidden;
+      margin: 0;
     }
 
     h1 {
-      margin-top: 80px;
-      font-size: 2.5em;
-      text-shadow: 2px 2px 10px #000;
+      font-size: 2em;
+      margin-bottom: 0.5em;
+      text-shadow: 0 0 10px #ff0040;
     }
 
-    p {
-      font-size: 1.1em;
-      color: #ddd;
+    form {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 1.5em;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
     }
 
-    input[type="email"], textarea {
-      padding: 10px;
-      font-size: 1em;
-      border-radius: 8px;
+    input, textarea, button {
+      width: 100%;
+      margin: 0.4em 0;
+      padding: 0.6em;
       border: none;
-      outline: none;
-      width: 260px;
-      margin-top: 10px;
+      border-radius: 5px;
+      font-size: 1em;
     }
 
-    textarea {
-      width: 320px;
-      height: 100px;
-      resize: none;
+    input, textarea {
+      background: #222;
+      color: #fff;
     }
 
     button {
-      padding: 10px 18px;
-      margin: 10px;
-      font-size: 1em;
-      background: #222;
-      color: #f8f8f8;
-      border: 1px solid #444;
-      border-radius: 8px;
+      background: #ff0040;
+      color: #fff;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background 0.3s;
     }
 
     button:hover {
-      background: #444;
-      transform: scale(1.03);
+      background: #cc0033;
     }
 
-    #resultBox {
-      margin-top: 25px;
-      font-size: 1.2em;
-      color: #ffcc99;
-      text-shadow: 0 0 8px #000;
-    }
-
-    /* Admin button */
-    #adminButton {
+    #adminBtn {
       position: fixed;
-      top: 15px;
-      right: 20px;
+      top: 10px;
+      right: 15px;
       background: transparent;
       color: #fff;
-      border: none;
-      font-size: 0.9em;
+      border: 1px solid #fff;
+      font-size: 0.8em;
+      padding: 5px 8px;
+      border-radius: 5px;
       cursor: pointer;
-      opacity: 0.7;
+      opacity: 0.6;
+      transition: opacity 0.3s;
     }
 
-    #adminButton:hover {
+    #adminBtn:hover {
       opacity: 1;
-      text-decoration: underline;
     }
 
-    /* Admin Panel Modal */
-    #adminPanel {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      color: white;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 100;
-    }
-
-    #adminPanel button {
-      margin: 8px;
-      background: #333;
-    }
-
-    #closeAdmin {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 1em;
-      cursor: pointer;
-      color: #fff;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-size: 1em;
-      color: #ccc;
-    }
-
-    /* Modal confirmation */
     .modal {
       display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      justify-content: center;
+      background: rgba(0, 0, 0, 0.8);
       align-items: center;
-      z-index: 200;
+      justify-content: center;
+      z-index: 10;
     }
 
     .modal-content {
       background: #111;
-      padding: 25px;
+      padding: 1.5em;
       border-radius: 10px;
-      border: 1px solid #555;
-      text-align: center;
-      max-width: 350px;
+      text-align: left;
+      max-width: 500px;
+      width: 90%;
     }
 
-    .modal-content button {
-      margin: 10px;
+    .close-btn {
+      float: right;
+      color: #ff0040;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+
+    .admin-controls button {
+      width: auto;
+      margin: 0.3em 0.2em;
+      padding: 0.4em 0.8em;
+    }
+
+    #confirmationModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #confirmationModal .modal-content {
+      text-align: center;
     }
   </style>
 </head>
 <body>
-
-  <button id="adminButton">Admin Login</button>
-
-  <h1>🎃 Ghoul Swap 2025 🎃</h1>
+  <h1>Ghoul Swap 2025 👻</h1>
   <p>Enter your email below and find out who the spinner has chosen for you...</p>
 
-  <input type="email" id="emailInput" placeholder="Enter your email">
-  <br>
-  <button onclick="fetchPairing()">Reveal My Match</button>
+  <form id="lookupForm">
+    <input type="email" id="email" placeholder="Your email..." required />
+    <button type="submit">Reveal My Match 💌</button>
+  </form>
 
-  <div id="resultBox"></div>
+  <p id="result" style="margin-top:1em;"></p>
 
-  <!-- Admin Panel -->
-  <div id="adminPanel">
-    <span id="closeAdmin">✕ Close</span>
-    <h2>Admin Controls</h2>
+  <!-- Admin Login Button -->
+  <button id="adminBtn">Admin Login</button>
 
-    <label for="emailList">Emails (comma-separated):</label>
-    <textarea id="emailList" placeholder="email1@example.com, email2@example.com"></textarea>
-
-    <label for="codeList">Codenames and Gender (comma-separated):</label>
-    <textarea id="codeList" placeholder="Phantom (M), Witch (F), Ghost (M)"></textarea>
-
-    <button onclick="generateAssignments()">Generate Assignments</button>
-    <button onclick="openModal('reshuffleConfirm')">Reshuffle</button>
-    <button onclick="openModal('clearConfirm')">Clear Entries</button>
-  </div>
-
-  <!-- Reshuffle Confirmation Modal -->
-  <div id="reshuffleConfirm" class="modal">
+  <!-- Admin Modal -->
+  <div class="modal" id="adminModal">
     <div class="modal-content">
-      <p>Are you sure you want to reshuffle all pairings?</p>
-      <button onclick="reshuffle()">Yes, Reshuffle</button>
-      <button onclick="closeModal('reshuffleConfirm')">Cancel</button>
+      <span class="close-btn" id="closeAdmin">&times;</span>
+      <h2>Admin Panel</h2>
+
+      <label><b>Emails (comma separated)</b></label>
+      <textarea id="emailList" rows="4" placeholder="example1@email.com, example2@email.com"></textarea>
+
+      <label><b>Codenames and Gender (format: Name (Gender))</b></label>
+      <textarea id="codeList" rows="4" placeholder="E.g. Shadow (M), Whisper (F), Phantom (M)"></textarea>
+
+      <div class="admin-controls">
+        <button id="generateAssignments">Generate Assignments</button>
+        <button id="reshuffle">Reshuffle</button>
+        <button id="clearEntries">Clear Entries</button>
+      </div>
     </div>
   </div>
 
-  <!-- Clear Entries Confirmation Modal -->
-  <div id="clearConfirm" class="modal">
+  <!-- Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
     <div class="modal-content">
-      <p>This will permanently delete all entries. Continue?</p>
-      <button onclick="clearEntries()">Yes, Clear All</button>
-      <button onclick="closeModal('clearConfirm')">Cancel</button>
+      <p id="confirmationMessage"></p>
+      <button id="confirmYes">Yes</button>
+      <button id="confirmNo">No</button>
     </div>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjNIslyJOAz4D6Vtx8Rxh2EsHBmivS2NkvpHiNegc3uy5TCxomcIKpqL6LdsRlMfqTBg/exec";
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwjNIslyJOAz4D6Vtx8Rxh2EsHBmivS2NkvpHiNegc3uy5TCxomcIKpqL6LdsRlMfqTBg/exec';
 
-    function fetchPairing() {
-      const email = document.getElementById("emailInput").value.trim();
-      const resultBox = document.getElementById("resultBox");
-      resultBox.textContent = "Consulting the spirits... 👁️";
+    const adminBtn = document.getElementById('adminBtn');
+    const adminModal = document.getElementById('adminModal');
+    const closeAdmin = document.getElementById('closeAdmin');
+    const lookupForm = document.getElementById('lookupForm');
+    const result = document.getElementById('result');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmationMessage = document.getElementById('confirmationMessage');
+    let confirmCallback = null;
 
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ type: "fetchPairing", email }),
-        headers: { "Content-Type": "application/json" },
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            resultBox.textContent = "👻 No pairing found for this email.";
-          } else {
-            resultBox.innerHTML = `
-              Your fate is sealed.<br>
-              <b>Code Name:</b> ${data.codeName}<br>
-              <b>Gender:</b> ${data.gender}
-            `;
-          }
-        })
-        .catch(() => {
-          resultBox.textContent = "Something went wrong. Try again later.";
+    adminBtn.addEventListener('click', () => {
+      const password = prompt('Enter admin password:');
+      if (password === 'escape2025') {
+        adminModal.style.display = 'flex';
+        loadAdminData(); // 👈 Load previous data automatically
+      } else {
+        alert('Incorrect password!');
+      }
+    });
+
+    closeAdmin.addEventListener('click', () => adminModal.style.display = 'none');
+
+    function showConfirmation(message, callback) {
+      confirmationMessage.textContent = message;
+      confirmCallback = callback;
+      confirmationModal.style.display = 'flex';
+    }
+
+    document.getElementById('confirmYes').addEventListener('click', () => {
+      confirmationModal.style.display = 'none';
+      if (confirmCallback) confirmCallback(true);
+    });
+
+    document.getElementById('confirmNo').addEventListener('click', () => {
+      confirmationModal.style.display = 'none';
+    });
+
+    lookupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      result.textContent = 'Summoning your match... 🕯️';
+      const res = await fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ type: 'fetchPairing', email }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (data.error) {
+        result.textContent = 'No pairing found for this email.';
+      } else {
+        result.innerHTML = `Your ghoul partner is <b>${data.codeName}</b> (${data.gender}) 👻`;
+      }
+    });
+
+    // Admin actions
+    document.getElementById('generateAssignments').addEventListener('click', async () => {
+      const emails = document.getElementById('emailList').value;
+      const codes = document.getElementById('codeList').value;
+      await fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ type: 'generateAssignments', emails, codes }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      alert('Assignments generated successfully!');
+    });
+
+    document.getElementById('reshuffle').addEventListener('click', () => {
+      showConfirmation('Are you sure you want to reshuffle all pairings?', async () => {
+        await fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify({ type: 'reshuffle' }),
+          headers: { 'Content-Type': 'application/json' }
         });
-    }
+        alert('Reshuffled successfully!');
+      });
+    });
 
-    // 🧛 Admin Logic
-    document.getElementById("adminButton").onclick = function() {
-      const password = prompt("Enter admin password:");
-      if (password === "escape2025") {
-        document.getElementById("adminPanel").style.display = "flex";
-      } else if (password) {
-        alert("Wrong password. The spirits reject your access.");
-      }
-    };
+    document.getElementById('clearEntries').addEventListener('click', () => {
+      showConfirmation('This will clear all pairings. Continue?', async () => {
+        await fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify({ type: 'clearEntries' }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        alert('Entries cleared.');
+      });
+    });
 
-    document.getElementById("closeAdmin").onclick = function() {
-      document.getElementById("adminPanel").style.display = "none";
-    };
-
-    function openModal(id) {
-      document.getElementById(id).style.display = "flex";
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = "none";
-    }
-
-    // 👻 Admin Actions
-    function generateAssignments() {
-      const emails = document.getElementById("emailList").value.trim();
-      const codes = document.getElementById("codeList").value.trim();
-
-      if (!emails || !codes) {
-        alert("Please fill in both Emails and Codenames + Gender fields.");
-        return;
-      }
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ type: "generateAssignments", emails, codes }),
-        headers: { "Content-Type": "application/json" },
-      })
-      .then(() => alert("Assignments generated successfully!"));
-    }
-
-    function reshuffle() {
-      closeModal('reshuffleConfirm');
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ type: "reshuffle" }),
-        headers: { "Content-Type": "application/json" },
-      }).then(() => alert("Pairings reshuffled successfully!"));
-    }
-
-    function clearEntries() {
-      closeModal('clearConfirm');
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ type: "clearEntries" }),
-        headers: { "Content-Type": "application/json" },
-      }).then(() => alert("All entries cleared successfully!"));
+    async function loadAdminData() {
+      const res = await fetch(scriptURL + '?type=getAdminData');
+      const data = await res.json();
+      document.getElementById('emailList').value = data.emails || '';
+      document.getElementById('codeList').value = data.codes || '';
     }
   </script>
 </body>
