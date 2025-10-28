@@ -13,7 +13,24 @@
       margin: 0;
       padding: 0;
     }
-    h1 { margin-top: 40px; }
+    h1 { margin-top: 60px; }
+
+    /* Discreet Admin Login Button (top-right corner) */
+    #adminLoginBtn {
+      position: fixed;
+      top: 10px;
+      right: 15px;
+      background: transparent;
+      color: #ccc;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: underline;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+    #adminLoginBtn:hover { opacity: 1; color: white; }
+
     input, textarea, button {
       margin: 10px;
       padding: 10px;
@@ -46,9 +63,43 @@
       margin-top: 15px;
     }
     .hidden { display: none; }
+
+    /* Modal styling */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    .modal.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-content {
+      background: #222;
+      padding: 20px 40px;
+      border-radius: 12px;
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 0 15px #ff2e63;
+      max-width: 90%;
+    }
+    .modal-content button {
+      background: #ff2e63;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
+  <button id="adminLoginBtn" onclick="toggleAdminLogin()">Admin Login</button>
+
   <h1>🎃 Manila Escape Pairing System</h1>
 
   <!-- User Section -->
@@ -59,8 +110,8 @@
     <div id="userResult" class="result-box hidden"></div>
   </div>
 
-  <!-- Admin Login -->
-  <div id="admin-login">
+  <!-- Admin Login Popup -->
+  <div id="admin-login" class="hidden">
     <p style="margin-top:40px;">🔐 Admin Login:</p>
     <input type="password" id="adminPassword" placeholder="Enter password" />
     <button onclick="loginAdmin()">Login</button>
@@ -73,30 +124,48 @@
     <textarea id="codeList" rows="4" placeholder="Codenames and Gender (comma-separated)"></textarea><br>
     <div class="admin-btns">
       <button onclick="generateAssignments()">Generate Assignments</button>
-      <button onclick="reshuffleAssignments()">Reshuffle</button>
-      <button onclick="clearEntries()">Clear Entries</button>
+      <button onclick="confirmReshuffle()">Reshuffle</button>
+      <button onclick="confirmClearEntries()">Clear Entries</button>
     </div>
-    <div id="status"></div>
+  </div>
+
+  <!-- Popup Modal -->
+  <div id="popupModal" class="modal">
+    <div class="modal-content" id="modalMessage"></div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content" id="confirmContent">
+      <p id="confirmText"></p>
+      <button id="confirmYes">Yes</button>
+      <button id="confirmNo">Cancel</button>
+    </div>
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyW1pWqFhz9BjUHPdf_OG-RcnC5eIoZWj9Pv0yggz6yctdp7eoayvyT1vFytREgn-H1lQ/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwdh-RqSOToSZ5kapVz1tgcjQ2xuJQPlgK6T5_sVSEy_nVifEnCAaZ30BLDxRBWLXUilA/exec";
     let assignments = JSON.parse(localStorage.getItem('assignments') || '{}');
+
+    function toggleAdminLogin() {
+      document.getElementById("admin-login").classList.toggle("hidden");
+    }
 
     function loginAdmin() {
       const pass = document.getElementById("adminPassword").value.trim();
       if (pass === "escape2025") {
         document.getElementById("adminPanel").style.display = "block";
         document.getElementById("admin-login").style.display = "none";
+        showPopup("✅ Admin access granted.");
       } else {
-        alert("Incorrect password.");
+        showPopup("❌ Incorrect password.");
       }
     }
 
     function generateAssignments() {
       const emails = document.getElementById("emailList").value.split(",").map(e => e.trim()).filter(Boolean);
       const codes = document.getElementById("codeList").value.split(",").map(c => c.trim()).filter(Boolean);
-      if (emails.length === 0 || codes.length === 0) return alert("Please enter both email and code lists.");
+      if (emails.length === 0 || codes.length === 0) return showPopup("⚠️ Please enter both email and code lists.");
 
       for (let email of emails) {
         if (!assignments[email]) {
@@ -107,48 +176,62 @@
         }
       }
       localStorage.setItem("assignments", JSON.stringify(assignments));
-      document.getElementById("status").innerText = "Assignments generated and saved!";
+      showPopup("✅ Assignments generated and saved to Sheet2!");
+    }
+
+    // Confirmation modals
+    function confirmReshuffle() {
+      showConfirm("This will clear Sheet2 and reshuffle all assignments. Continue?", reshuffleAssignments);
+    }
+
+    function confirmClearEntries() {
+      showConfirm("This will clear all local entries (not Sheet2). Continue?", clearEntries);
     }
 
     function reshuffleAssignments() {
       const emails = Object.keys(assignments);
       const codes = document.getElementById("codeList").value.split(",").map(c => c.trim()).filter(Boolean);
-      if (emails.length === 0 || codes.length === 0) return alert("Need existing assignments and code list.");
+      if (emails.length === 0 || codes.length === 0) return showPopup("⚠️ Need existing assignments and code list.");
 
-      assignments = {};
-      for (let email of emails) {
-        const randomIndex = Math.floor(Math.random() * codes.length);
-        const codeGender = codes.splice(randomIndex, 1)[0];
-        assignments[email] = codeGender;
-        saveToSheet(email, codeGender);
-      }
-      localStorage.setItem("assignments", JSON.stringify(assignments));
-      document.getElementById("status").innerText = "Assignments reshuffled successfully!";
+      showPopup("♻️ Clearing Sheet2...");
+      fetch(scriptURL, {
+        method: "POST",
+        body: new URLSearchParams({ action: "clearSheet2" })
+      })
+      .then(() => {
+        assignments = {};
+        for (let email of emails) {
+          const randomIndex = Math.floor(Math.random() * codes.length);
+          const codeGender = codes.splice(randomIndex, 1)[0];
+          assignments[email] = codeGender;
+          saveToSheet(email, codeGender);
+        }
+        localStorage.setItem("assignments", JSON.stringify(assignments));
+        showPopup("🎲 Reshuffled and saved to a clean Sheet2!");
+      })
+      .catch(err => console.error("Error:", err));
     }
 
     function clearEntries() {
-      if (confirm("Are you sure you want to clear all entries?")) {
-        localStorage.removeItem("assignments");
-        assignments = {};
-        document.getElementById("emailList").value = "";
-        document.getElementById("codeList").value = "";
-        document.getElementById("status").innerText = "All entries cleared!";
-      }
+      localStorage.removeItem("assignments");
+      assignments = {};
+      document.getElementById("emailList").value = "";
+      document.getElementById("codeList").value = "";
+      showPopup("🧹 All local entries cleared!");
     }
 
     function checkAssignment() {
       const email = document.getElementById("userEmail").value.trim();
       const resultDiv = document.getElementById("userResult");
-      if (!email) return alert("Please enter your email.");
+      if (!email) return showPopup("📧 Please enter your email.");
 
       const assignment = assignments[email];
       if (assignment) {
         resultDiv.innerHTML = `<h3>Your Result</h3><p>${assignment}</p>`;
-        resultDiv.classList.remove("hidden");
       } else {
         resultDiv.innerHTML = `<p>No assignment found for this email yet.</p>`;
-        resultDiv.classList.remove("hidden");
       }
+      resultDiv.classList.remove("hidden");
     }
 
     function saveToSheet(email, codeGender) {
@@ -156,14 +239,39 @@
       fetch(scriptURL, {
         method: "POST",
         body: new URLSearchParams({
+          action: "saveEntry",
           email: email,
           codeName: codeName,
           gender: gender
         })
       })
       .then(res => res.text())
-      .then(data => console.log("Saved to Sheet:", data))
+      .then(data => console.log("Saved to Sheet2:", data))
       .catch(err => console.error("Error:", err));
+    }
+
+    function showPopup(message) {
+      const modal = document.getElementById("popupModal");
+      const msg = document.getElementById("modalMessage");
+      msg.innerHTML = message;
+      modal.classList.add("show");
+      setTimeout(() => modal.classList.remove("show"), 2000);
+    }
+
+    function showConfirm(message, onConfirm) {
+      const modal = document.getElementById("confirmModal");
+      const text = document.getElementById("confirmText");
+      const yesBtn = document.getElementById("confirmYes");
+      const noBtn = document.getElementById("confirmNo");
+
+      text.textContent = message;
+      modal.classList.add("show");
+
+      yesBtn.onclick = () => {
+        modal.classList.remove("show");
+        onConfirm();
+      };
+      noBtn.onclick = () => modal.classList.remove("show");
     }
   </script>
 </body>
