@@ -35,7 +35,7 @@
     }
 
     button {
-      padding: 10px 16px;
+      padding: 15px 25px;
       margin: 8px;
       background-color:black;
       border: none;
@@ -46,7 +46,8 @@
     }
 
     button:hover {
-      background-color: #ba68c8;
+      background-color:white;
+      color:black;
     }
 
     #adminBtn {
@@ -220,7 +221,7 @@
           const match = rows.find(r => r[0].replace(/"/g, '').toLowerCase() === email);
           document.getElementById('result').textContent = match
             ? `Your code name: ${match[1].replace(/"/g, '')}`
-            : 'No assignment found yet.';
+            : 'Your fate cannot be forseen...yet.';
         });
     }
   </script>
