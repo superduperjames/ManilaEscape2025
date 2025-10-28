@@ -1,179 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manila Escape 2025 – Haunted Spinner</title>
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: radial-gradient(circle at top, #000, #111, #000);
-      color: #fff;
-      text-align: center;
-      height: 100vh;
-      margin: 0;
-      overflow-x: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Haunted Spinner</title>
+<style>
+body {
+  margin:0; height:100vh; overflow:hidden; font-family:'Courier New', monospace;
+  background: url('https://res.cloudinary.com/eventmobi/image/upload/v1761237992/_James%20Assets/.test%20app%20assets/Abstract%20Backgrounds/Haunted%20Background/2151153754.jpg') no-repeat center center fixed;
+  background-size: cover; position:relative; color:#fff;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+}
 
-    h1 {
-      font-size: 2.2rem;
-      margin-top: 40px;
-      color: #ff4c4c;
-      text-shadow: 0 0 20px #ff0000;
-      animation: flicker 1.5s infinite alternate;
-    }
+/* Ghostly Mist */
+.mist, .mist::before, .mist::after {
+  content:""; position:absolute; top:0; left:0; width:200%; height:200%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%),
+             radial-gradient(circle at 70% 70%, rgba(255,255,255,0.1), transparent 70%);
+  mix-blend-mode: lighten; opacity:0.25; animation:fogMove 40s linear infinite; pointer-events:none;
+}
+.mist::before { animation:fogMove2 60s linear infinite; opacity:0.3; }
+.mist::after { animation:fogMove3 90s linear infinite; opacity:0.2; }
+@keyframes fogMove { from {transform:translateX(-10%) translateY(-10%) scale(1.2);} to {transform:translateX(10%) translateY(10%) scale(1.3);} }
+@keyframes fogMove2 { from {transform:translateX(10%) translateY(0%) scale(1.1);} to {transform:translateX(-10%) translateY(5%) scale(1.25);} }
+@keyframes fogMove3 { from {transform:translateX(-5%) translateY(5%) scale(1);} to {transform:translateX(5%) translateY(-5%) scale(1.2);} }
 
-    @keyframes flicker {
-      0% { opacity: 1; text-shadow: 0 0 20px #ff0000; }
-      50% { opacity: 0.6; text-shadow: 0 0 5px #880000; }
-      100% { opacity: 1; text-shadow: 0 0 20px #ff0000; }
-    }
+.container {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  background: black;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px #ff0000, 0 0 40px #ff4444;
+  max-width: 480px;
+  width: 90%;
+  animation: flickerGlow 2.5s infinite alternate;
+}
 
-    #spinnerBox {
-      margin-top: 50px;
-    }
+@keyframes flickerGlow {
+  0% { box-shadow: 0 0 20px #ff0000, 0 0 40px #ff4444; }
+  50% { box-shadow: 0 0 15px #ff3300, 0 0 35px #ff4444; }
+  100% { box-shadow: 0 0 20px #ff0000, 0 0 40px #ff4444; }
+}
+h1 { margin-bottom:10px; font-size:2.2em; letter-spacing:2px; color:#ff6666; text-shadow:0 0 5px #ff0000,0 0 10px #ff4444; }
+p.intro { font-size:1.1em; color:#ddd; margin-bottom:20px; animation:fadeIn 3s ease; }
+input[type="email"], button { padding:10px; margin:10px; border:none; font-size:16px; border-radius:6px; }
+input[type="email"] { width:260px; }
+button { cursor:pointer; transition: all 0.3s ease; }
+#resultBox {
+  display:none; color:#fff; padding:20px; border-radius:10px; margin-top:20px;
+  animation:fadeIn 1s ease forwards; background-color:black; text-align:center;
+  font-size:1.2em; font-weight:bold;
+}
+#warningNote {
+  display:none; color:#ff6666; margin-top:10px; font-size:0.9em;
+  text-shadow:0 0 5px #ff6666,0 0 10px #ff9999; animation:floatPulse 2s ease-in-out infinite;
+}
+@keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+@keyframes floatPulse { 0% {opacity:0.6;} 50% {opacity:1;} 100% {opacity:0.6;} }
 
-    input[type="email"] {
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      width: 250px;
-      font-size: 1rem;
-      text-align: center;
-    }
+/* Admin */
+#adminLink { position:fixed; top:10px; right:20px; color:white; cursor:pointer; font-size:14px; opacity:0.7; z-index:3; }
+#adminLink:hover { opacity:1; text-decoration:underline; }
+#adminPanel { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background: rgba(255,255,255,0.95); color:#000; padding:20px; border-radius:10px; z-index:4; width:360px; max-width:90%;
+}
+#closeAdmin { position:absolute; top:5px; right:10px; cursor:pointer; font-weight:bold; }
+#adminPanel input, #adminPanel textarea { width:100%; margin-top:8px; }
+#adminPanel button { margin-top:8px; background-color:black; color:white; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; }
+#adminPanel button:hover { background-color:#333; }
 
-    button {
-      padding: 10px 25px;
-      border: none;
-      background-color: #ff4c4c;
-      color: #fff;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-left: 10px;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background-color: #ff7777;
-    }
-
-    #resultBox {
-      margin-top: 40px;
-      font-size: 1.5rem;
-      display: none;
-    }
-
-    #warningNote {
-      font-size: 0.9rem;
-      color: #ffaaaa;
-      margin-top: 10px;
-      display: none;
-    }
-
-    .emoji {
-      position: fixed;
-      pointer-events: none;
-      user-select: none;
-      z-index: 9999;
-      opacity: 0.9;
-    }
-
-    /* Admin Panel */
-    #adminLink {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 0.9rem;
-      color: white;
-      cursor: pointer;
-      opacity: 0.6;
-    }
-
-    #adminLink:hover {
-      opacity: 1;
-    }
-
-    #adminPanel {
-      display: none;
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(20, 20, 20, 0.98);
-      border-radius: 12px;
-      padding: 20px;
-      width: 90%;
-      max-width: 600px;
-      z-index: 10000;
-      box-shadow: 0 0 30px #ff000055;
-    }
-
-    #closeAdmin {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      cursor: pointer;
-      color: #ff8888;
-    }
-
-    textarea {
-      width: 100%;
-      height: 100px;
-      border-radius: 8px;
-      border: none;
-      margin-top: 10px;
-      padding: 8px;
-      resize: vertical;
-    }
-
-    .admin-buttons {
-      margin-top: 15px;
-    }
-
-    .admin-buttons button {
-      margin: 5px;
-    }
-
-  </style>
+.emoji { position:absolute; pointer-events:none; }
+</style>
 </head>
 <body>
-  <h1>🎃 Haunted Spinner 🎃</h1>
-  <div id="spinnerBox">
-    <input type="email" id="emailInput" placeholder="Enter your email..." />
-    <button id="spinBtn">SPIN</button>
-  </div>
+
+<div class="mist"></div>
+
+<audio autoplay loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_16a6a84e64.mp3?filename=whispers-ambient-14032.mp3" type="audio/mpeg">
+</audio>
+
+<div id="adminLink">👻 Admin Login</div>
+
+<div class="container">
+  <h1>🎡 The Haunted Spinner</h1>
+  <p class="intro">Spin! Spin! Spin! Click here to reveal who the roulette has chosen for you...</p>
+  <input type="email" id="emailInput" placeholder="Enter your email..." />
+  <button id="spinBtn">Spin</button>
   <div id="resultBox"></div>
-  <div id="warningNote">Once you've spun, your fate is sealed 👻</div>
+  <p id="warningNote">⚠️ Make sure to copy or screenshot your result! It will disappear if you leave or refresh the page.</p>
+</div>
 
-  <div id="adminLink">Admin Login</div>
+<!-- Admin Panel -->
+<div id="adminPanel">
+  <span id="closeAdmin">✖</span>
+  <h3>Admin Panel</h3>
+  <input type="password" id="adminPassword" placeholder="Enter password" />
+  <button id="loginBtn">Login</button>
 
-  <div id="adminPanel">
-    <div id="closeAdmin">✕ Close</div>
-    <h2>🕸️ Admin Panel</h2>
-    <input type="password" id="adminPassword" placeholder="Enter password..." />
-    <button id="loginBtn">Login</button>
-
-    <div id="adminContent" style="display:none;">
-      <h3>Assignments</h3>
-      <label>Emails:</label>
-      <textarea id="emailList" placeholder="Email,Email,..."></textarea>
-      <label>Results:</label>
-      <textarea id="resultList" placeholder="Result per line"></textarea>
-
-      <div class="admin-buttons">
-        <button id="generateBtn">Generate Assignments</button>
-        <button id="resetSpinBtn">Reset Spinner</button>
-        <button id="exportBtn">Export Results (XLSX)</button>
-        <button id="clearBtn">Clear Local Data</button>
-      </div>
-    </div>
+  <div id="adminContent" style="display:none;">
+    <h4>Upload Assignments</h4>
+    <textarea id="assignmentsText" placeholder="Format: email, code name + gender (one per line)..."></textarea>
+    <button id="generateBtn">Generate Assignments</button>
   </div>
+</div>
 
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-  <script>
-const ADMIN_PASSWORD = 'escape2025';
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyU1eV1l2oD9Vbjih5SHhbcb5bxjve-ST7eTzDkyIAqc0BnAlRyJuN7BmX9fmFS8Ekw4Q/exec';
+<script>
+const SPREADSHEET_URL = "https://script.google.com/macros/s/AKfycbyW1pWqFhz9BjUHPdf_OG-RcnC5eIoZWj9Pv0yggz6yctdp7eoayvyT1vFytREgn-H1lQ/exec";
+const ADMIN_PASSWORD = "escape2025";
 
 const spinBtn = document.getElementById('spinBtn');
 const emailInput = document.getElementById('emailInput');
@@ -185,166 +121,89 @@ const closeAdmin = document.getElementById('closeAdmin');
 const loginBtn = document.getElementById('loginBtn');
 const adminContent = document.getElementById('adminContent');
 const generateBtn = document.getElementById('generateBtn');
-const resetSpinBtn = document.getElementById('resetSpinBtn');
-const exportBtn = document.getElementById('exportBtn');
-const clearBtn = document.getElementById('clearBtn');
 
-let assignments = {};
+const assignments = {};
 
 function normalizeEmail(e){ return (e || '').trim().toLowerCase(); }
 
-window.addEventListener('load', () => {
-  const stored = localStorage.getItem('hauntedSpinnerAssignments');
-  assignments = stored ? JSON.parse(stored) : {};
-  resultBox.style.display = 'none';
-  warningNote.style.display = 'none';
-});
-
 function spawnEmojis() {
-  const emojis = ["🎃","👻","💀","🔪","🩸","🕷️","🦇","🐈‍⬛","🪦","😈"];
-  for(let i=0;i<12;i++){
+  const emojis = ["🎃","👻","💀","🕷️","🦇","🪦"];
+  for(let i=0;i<10;i++){
     const span = document.createElement('span');
     span.className='emoji';
     span.textContent = emojis[Math.floor(Math.random()*emojis.length)];
     span.style.top = Math.random()*window.innerHeight + 'px';
     span.style.left = Math.random()*window.innerWidth + 'px';
-    const size = 20 + Math.random()*40; 
-    span.style.fontSize = size + 'px';
-    const direction = Math.random() < 0.5 ? 1 : -1;
-    const duration = 1 + Math.random()*1.5;
-    span.animate([
-      { transform: 'rotate(0deg) scale(1)', opacity:1 },
-      { transform: `rotate(${direction*360}deg) scale(1.2)`, opacity:1, offset:0.5 },
-      { transform: `rotate(${direction*720}deg) scale(0.8)`, opacity:0 }
-    ], { duration: duration*1000, easing: 'ease-in-out' });
+    span.style.fontSize = (20 + Math.random()*40) + 'px';
     document.body.appendChild(span);
-    setTimeout(()=>span.remove(), duration*1000);
+    setTimeout(()=>span.remove(), 1200);
   }
 }
 
-spinBtn.addEventListener('click', async ()=>{
+spinBtn.addEventListener('click', ()=>{
   const emailRaw = emailInput.value.trim();
   if(!emailRaw){ alert('Please enter your email before spinning!'); return; }
   const emailKey = normalizeEmail(emailRaw);
 
   spawnEmojis();
-
   resultBox.style.display='none';
   warningNote.style.display='none';
 
-  setTimeout(async ()=>{
-    let result = assignments[emailKey] || "No assigned result for this email!";
-    resultBox.textContent = `The roulette has chosen: ${result}`;
+  const sampleResults = [
+    "Phantom – Male", "Wraith – Female", "Specter – Male",
+    "Shade – Female", "Ghoul – Male", "Apparition – Female"
+  ];
+  const randomResult = sampleResults[Math.floor(Math.random()*sampleResults.length)];
+
+  setTimeout(()=>{
+    resultBox.textContent = `The roulette has chosen: ${randomResult}`;
     resultBox.style.display='block';
     warningNote.style.display='block';
 
+    fetch(SPREADSHEET_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        type: "userSpin",
+        email: emailKey,
+        result: randomResult
+      })
+    });
+
     emailInput.disabled=true;
     spinBtn.disabled=true;
-    emailInput.style.opacity=0.5;
-    spinBtn.style.opacity=0.5;
     spinBtn.style.cursor='not-allowed';
-
-    // Save spin result to Sheet
-    try {
-      await fetch(WEB_APP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: "userSpin",
-          email: emailKey,
-          result: result
-        })
-      });
-      console.log("Saved to Google Sheet:", emailKey, result);
-    } catch (err) {
-      console.error("Error saving to sheet:", err);
-    }
   },1500);
 });
 
-// Admin Panel
+// Admin Panel Logic
 adminLink.addEventListener('click',()=>{ adminPanel.style.display='block'; });
 closeAdmin.addEventListener('click',()=>adminPanel.style.display='none');
 
 loginBtn.addEventListener('click',()=>{
-  const password=document.getElementById('adminPassword').value||'';
+  const password = document.getElementById('adminPassword').value;
   if(password===ADMIN_PASSWORD){
     adminContent.style.display='block';
-    alert('Admin login successful!');
-    const stored = localStorage.getItem('hauntedSpinnerAssignments');
-    assignments = stored ? JSON.parse(stored) : {};
-    const emailListArea = document.getElementById('emailList');
-    const resultListArea = document.getElementById('resultList');
-    let emailContent = '';
-    let resultContent = '';
-    for(let email in assignments){
-        emailContent += email + ',';
-        resultContent += assignments[email] + '\n';
-    }
-    emailListArea.value = emailContent + '\n';
-    resultListArea.value = resultContent + '\n';
-  } else alert('Incorrect password!');
-});
-
-generateBtn.addEventListener('click', async ()=>{
-  const emailRaw = document.getElementById('emailList').value;
-  const resultsRaw = document.getElementById('resultList').value;
-  const emailLines = emailRaw.split(/[\n,]+/).map(e=>normalizeEmail(e)).filter(e=>e);
-  const resultLines = resultsRaw.split('\n').map(r=>r.trim()).filter(r=>r);
-  emailLines.forEach((email,i)=>{ if(!(email in assignments) && resultLines[i]) assignments[email]=resultLines[i]; });
-  localStorage.setItem('hauntedSpinnerAssignments',JSON.stringify(assignments));
-  alert(`Assignments saved! Total: ${Object.keys(assignments).length} entries.`);
-
-  // Append all data + separator to Sheet
-  try {
-    await fetch(WEB_APP_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: "adminReplace",
-        entries: Object.keys(assignments).map(email => ({
-          email: email,
-          result: assignments[email]
-        }))
-      })
-    });
-    console.log("Admin data appended to Google Sheet (with separator).");
-  } catch (err) {
-    console.error("Error sending admin data:", err);
+    alert('Admin access granted.');
+  } else {
+    alert('Incorrect password!');
   }
 });
 
-resetSpinBtn.addEventListener('click',()=>{
-  resultBox.style.display='none';
-  warningNote.style.display='none';
-  emailInput.value='';
-  emailInput.disabled=false;
-  spinBtn.disabled=false;
-  emailInput.style.opacity=1;
-  spinBtn.style.opacity=1;
-  spinBtn.style.cursor='pointer';
+generateBtn.addEventListener('click',()=>{
+  const lines = document.getElementById('assignmentsText').value.trim().split("\n").filter(l=>l);
+  if(!lines.length){ alert("No data to upload!"); return; }
+  const entries = lines.map(l=>{
+    const parts = l.split(",");
+    return { email: normalizeEmail(parts[0]||""), result: (parts[1]||"").trim() };
+  });
+  fetch(SPREADSHEET_URL, {
+    method:"POST",
+    body: JSON.stringify({ type:"adminReplace", entries })
+  })
+  .then(r=>r.text())
+  .then(()=>alert("Assignments uploaded successfully!"));
 });
+</script>
 
-exportBtn.addEventListener('click',()=>{
-  const data=[["Email","Result"]];
-  for(let email in assignments){ data.push([email,assignments[email]]); }
-  const ws=XLSX.utils.aoa_to_sheet(data);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Results");
-  XLSX.writeFile(wb,"HauntedSpinnerResults.xlsx");
-});
-
-clearBtn.addEventListener('click', () => {
-  if(confirm("Are you sure you want to clear all entries? This cannot be undone.")) {
-    assignments = {};
-    localStorage.removeItem('hauntedSpinnerAssignments');
-    document.getElementById('emailList').value = '\n';
-    document.getElementById('resultList').value = '\n';
-    alert("All entries cleared locally. (Sheet data remains.)");
-  }
-});
-  </script>
 </body>
 </html>
