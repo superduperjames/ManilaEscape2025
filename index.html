@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manila Escape Ghoul Swap Spinner</title>
+  <title>Manila Escape 2025</title>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') no-repeat center center fixed;
+      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759502727/_James%20Assets/.test%20app%20assets/MML%20October%202025/218016_small-ezgif.com-video-to-gif-converter.gif') no-repeat center center fixed;
       background-size: cover;
       color: white;
       text-align: center;
@@ -28,16 +28,16 @@
     input, textarea {
       padding: 8px;
       margin: 8px;
-      width: 55%;
+      width: 80%;
       border: none;
       border-radius: 6px;
       font-size: 1em;
     }
 
     button {
-      padding: 15px 25px;
+      padding: 10px 16px;
       margin: 8px;
-      background-color:black;
+      background-color: #9c27b0;
       border: none;
       color: white;
       border-radius: 8px;
@@ -46,8 +46,7 @@
     }
 
     button:hover {
-      background-color:white;
-      color:black;
+      background-color: #ba68c8;
     }
 
     #adminBtn {
@@ -97,11 +96,11 @@
   <button id="adminBtn">Admin Login</button>
 
   <div id="mainContent">
-    <h1>🕷️ Ghoul Swap Spinner 🕸️</h1>
-    <p>Step closer... Enter your email and see who the spinner has chosen to cross your path…</p>
+    <h1>🎃 Manila Escape 2025 🎃</h1>
+    <p>Enter your email below to see your assigned code name.</p>
     <input type="email" id="userEmail" placeholder="Enter your email" required />
     <br>
-    <button onclick="checkAssignment()">Spin!</button>
+    <button onclick="checkAssignment()">Reveal My Assignment</button>
     <p id="result"></p>
   </div>
 
@@ -221,7 +220,7 @@
           const match = rows.find(r => r[0].replace(/"/g, '').toLowerCase() === email);
           document.getElementById('result').textContent = match
             ? `Your code name: ${match[1].replace(/"/g, '')}`
-            : 'The spirits remain silent... Your fate is yet to be revealed.';
+            : 'No assignment found yet.';
         });
     }
   </script>
