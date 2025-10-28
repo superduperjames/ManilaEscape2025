@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manila Escape Pairing</title>
+  <title>Manila Escape Spinner</title>
   <style>
 body {
   background: url("https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif") no-repeat center center fixed;
@@ -14,7 +14,7 @@ body {
   margin: 0;
   padding: 0;
 }
-    h1 { margin-top: 60px; }
+    h1 { margin-top: 300px; }
 
     /* Discreet Admin Login Button (top-right corner) */
     #adminLoginBtn {
@@ -101,13 +101,13 @@ body {
 <body>
   <button id="adminLoginBtn" onclick="toggleAdminLogin()">Admin Login</button>
 
-  <h1>🎃 Manila Escape Pairing System</h1>
+  <h1>🕷️ Ghoul Swap Spinner 🕸️</h1>
 
   <!-- User Section -->
   <div id="user-section">
     <p>Enter your email to see your assigned Code Name:</p>
     <input type="email" id="userEmail" placeholder="Enter your email" required />
-    <button onclick="checkAssignment()">Check Assignment</button>
+    <button onclick="checkAssignment()">Spin! Spin! Spin!</button>
     <div id="userResult" class="result-box hidden"></div>
   </div>
 
@@ -228,9 +228,9 @@ body {
 
       const assignment = assignments[email];
       if (assignment) {
-        resultDiv.innerHTML = `<h3>Your Result</h3><p>${assignment}</p>`;
+        resultDiv.innerHTML = `<h3>The shadows whisper... Your match is:</h3><p>${assignment}</p>`;
       } else {
-        resultDiv.innerHTML = `<p>No assignment found for this email yet.</p>`;
+        resultDiv.innerHTML = `<p>👻 No pairing found for this email... yet.</p>`;
       }
       resultDiv.classList.remove("hidden");
     }
