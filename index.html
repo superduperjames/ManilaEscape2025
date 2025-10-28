@@ -3,278 +3,176 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manila Escape Spinner</title>
+  <title>🎡 Ghoul Swap Spinner</title>
   <style>
-body {
-  background: url("https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif") no-repeat center center fixed;
-  background-size: cover;
-  color: #f1f1f1;
-  font-family: 'Poppins', sans-serif;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-    h1 { margin-top: 300px; }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-    /* Discreet Admin Login Button (top-right corner) */
-    #adminLoginBtn {
-      position: fixed;
-      top: 10px;
-      right: 15px;
-      background: transparent;
-      color: #ccc;
-      border: none;
-      font-size: 14px;
-      cursor: pointer;
-      text-decoration: underline;
-      opacity: 0.7;
-      transition: opacity 0.3s;
-    }
-    #adminLoginBtn:hover { opacity: 1; color: white; }
-
-    input, textarea, button {
-      margin: 10px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-    }
-    input, textarea { width: 80%; max-width: 500px; }
-    button {
-      cursor: pointer;
-      background: #ff2e63;
-      color: white;
-      transition: background 0.3s;
-    }
-    button:hover { background: #e61b50; }
-    .admin-panel {
-      display: none;
-      margin-top: 30px;
-      border-top: 1px solid #333;
-      padding-top: 20px;
-    }
-    .result-box {
-      margin-top: 30px;
-      background: #1a1a1a;
-      display: inline-block;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    .admin-btns {
-      margin-top: 15px;
-    }
-    .hidden { display: none; }
-
-    /* Modal styling */
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      height: 100vh;
+      color: #fff;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
-    }
-    .modal.show {
-      visibility: visible;
-      opacity: 1;
-    }
-    .modal-content {
-      background: #222;
-      padding: 20px 40px;
-      border-radius: 12px;
-      color: #fff;
       text-align: center;
-      box-shadow: 0 0 15px #ff2e63;
-      max-width: 90%;
+      overflow: hidden;
     }
-    .modal-content button {
-      background: #ff2e63;
-      margin-top: 15px;
+
+    h1 {
+      font-size: 2em;
+      color: #ffb3b3;
+      text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+      margin-bottom: 25px;
+    }
+
+    .spinner-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin-bottom: 40px;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 8px solid #ff4b4b;
+      background: conic-gradient(
+        #ff6f61 0deg 45deg,
+        #f7b267 45deg 90deg,
+        #f79d65 90deg 135deg,
+        #f4845f 135deg 180deg,
+        #ffb997 180deg 225deg,
+        #ff9b85 225deg 270deg,
+        #f27059 270deg 315deg,
+        #ff6b6b 315deg 360deg
+      );
+      transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+      box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+    }
+
+    .pointer {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid #fff;
+      filter: drop-shadow(0 0 5px #ff0000);
+    }
+
+    button {
+      background: #ff4b4b;
+      color: white;
+      border: none;
+      padding: 14px 25px;
+      font-size: 1em;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(255, 75, 75, 0.6);
+    }
+
+    button:hover {
+      background: #ff2222;
+      transform: scale(1.05);
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+
+    .loading {
+      font-size: 1.1em;
+      color: #ffb3b3;
+      animation: flicker 1.5s infinite alternate;
+    }
+
+    @keyframes flicker {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      font-size: 0.8em;
+      color: rgba(255,255,255,0.5);
     }
   </style>
 </head>
 <body>
-  <button id="adminLoginBtn" onclick="toggleAdminLogin()">Admin Login</button>
+  <h1>🕸️ Spin to Reveal Your Ghoul Swap Match!</h1>
 
-  <h1>🕷️ Ghoul Swap Spinner 🕸️</h1>
-
-  <!-- User Section -->
-  <div id="user-section">
-    <p>Enter your email to see your assigned Code Name:</p>
-    <input type="email" id="userEmail" placeholder="Enter your email" required />
-    <button onclick="checkAssignment()">Spin! Spin! Spin!</button>
-    <div id="userResult" class="result-box hidden"></div>
+  <div class="spinner-container">
+    <div class="pointer"></div>
+    <div class="wheel" id="wheel"></div>
   </div>
 
-  <!-- Admin Login Popup -->
-  <div id="admin-login" class="hidden">
-    <p style="margin-top:40px;">🔐 Admin Login:</p>
-    <input type="password" id="adminPassword" placeholder="Enter password" />
-    <button onclick="loginAdmin()">Login</button>
-  </div>
+  <button id="spinBtn">Spin the Wheel</button>
 
-  <!-- Admin Panel -->
-  <div id="adminPanel" class="admin-panel">
-    <h2>Admin Panel</h2>
-    <textarea id="emailList" rows="4" placeholder="Email entries (comma-separated)"></textarea><br>
-    <textarea id="codeList" rows="4" placeholder="Codenames and Gender (comma-separated)"></textarea><br>
-    <div class="admin-btns">
-      <button onclick="generateAssignments()">Generate Assignments</button>
-      <button onclick="confirmReshuffle()">Reshuffle</button>
-      <button onclick="confirmClearEntries()">Clear Entries</button>
-    </div>
-  </div>
+  <div class="result" id="result">Who will you haunt with gifts? 👀</div>
 
-  <!-- Popup Modal -->
-  <div id="popupModal" class="modal">
-    <div class="modal-content" id="modalMessage"></div>
-  </div>
-
-  <!-- Confirmation Modal -->
-  <div id="confirmModal" class="modal">
-    <div class="modal-content" id="confirmContent">
-      <p id="confirmText"></p>
-      <button id="confirmYes">Yes</button>
-      <button id="confirmNo">Cancel</button>
-    </div>
-  </div>
+  <footer>Manila Escape 2025 • Ghoul Swap Spinner</footer>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyU1CW-3Q_ML8mjPsWlmW4SnoCiWAPLad-Yb7xr5qO_3jfl3Kadtwe5dohvhh0Mq0QgAg/exec";
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyg8geKLRkYaWmhs9QkYHTcuk4fqnUK6rnbccf0073iiuTkL4ZM-70lJAWKxxfMbRtgew/exec';
+    const wheel = document.getElementById('wheel');
+    const resultDiv = document.getElementById('result');
+    const spinBtn = document.getElementById('spinBtn');
 
-    let assignments = JSON.parse(localStorage.getItem('assignments') || '{}');
+    let spinning = false;
 
-    function toggleAdminLogin() {
-      document.getElementById("admin-login").classList.toggle("hidden");
-    }
-
-    function loginAdmin() {
-      const pass = document.getElementById("adminPassword").value.trim();
-      if (pass === "escape2025") {
-        document.getElementById("adminPanel").style.display = "block";
-        document.getElementById("admin-login").style.display = "none";
-        showPopup("✅ Admin access granted.");
-      } else {
-        showPopup("❌ Incorrect password.");
+    async function fetchGhouls() {
+      try {
+        resultDiv.textContent = "Fetching ghouls from the underworld...";
+        const response = await fetch(`${scriptURL}?action=getGhouls`);
+        const data = await response.json();
+        return data.ghouls || [];
+      } catch (error) {
+        console.error("Error fetching ghouls:", error);
+        resultDiv.textContent = "⚠️ Couldn't fetch ghouls. Try again later.";
+        return [];
       }
     }
 
-    function generateAssignments() {
-      const emails = document.getElementById("emailList").value.split(",").map(e => e.trim()).filter(Boolean);
-      const codes = document.getElementById("codeList").value.split(",").map(c => c.trim()).filter(Boolean);
-      if (emails.length === 0 || codes.length === 0) return showPopup("⚠️ Please enter both email and code lists.");
+    async function spinWheel() {
+      if (spinning) return;
+      spinning = true;
+      resultDiv.textContent = "Spinning... 🌀";
+      spinBtn.disabled = true;
 
-      for (let email of emails) {
-        if (!assignments[email]) {
-          const randomIndex = Math.floor(Math.random() * codes.length);
-          const codeGender = codes.splice(randomIndex, 1)[0];
-          assignments[email] = codeGender;
-          saveToSheet(email, codeGender);
-        }
+      const ghouls = await fetchGhouls();
+      if (ghouls.length === 0) {
+        resultDiv.textContent = "👻 No ghouls found!";
+        spinBtn.disabled = false;
+        spinning = false;
+        return;
       }
-      localStorage.setItem("assignments", JSON.stringify(assignments));
-      showPopup("✅ Assignments generated and saved to Sheet2!");
+
+      const randomIndex = Math.floor(Math.random() * ghouls.length);
+      const degrees = 3600 + (360 / ghouls.length) * randomIndex;
+      wheel.style.transform = `rotate(${degrees}deg)`;
+
+      setTimeout(() => {
+        const chosen = ghouls[randomIndex];
+        resultDiv.innerHTML = `🎉 Your Ghoul Swap Match is: <b>${chosen}</b>!`;
+        spinBtn.disabled = false;
+        spinning = false;
+      }, 4500);
     }
 
-    // Confirmation modals
-    function confirmReshuffle() {
-      showConfirm("This will clear Sheet2 and reshuffle all assignments. Continue?", reshuffleAssignments);
-    }
-
-    function confirmClearEntries() {
-      showConfirm("This will clear all local entries (not Sheet2). Continue?", clearEntries);
-    }
-
-    function reshuffleAssignments() {
-      const emails = Object.keys(assignments);
-      const codes = document.getElementById("codeList").value.split(",").map(c => c.trim()).filter(Boolean);
-      if (emails.length === 0 || codes.length === 0) return showPopup("⚠️ Need existing assignments and code list.");
-
-      showPopup("♻️ Clearing Sheet2...");
-      fetch(scriptURL, {
-        method: "POST",
-        body: new URLSearchParams({ action: "clearSheet2" })
-      })
-      .then(() => {
-        assignments = {};
-        for (let email of emails) {
-          const randomIndex = Math.floor(Math.random() * codes.length);
-          const codeGender = codes.splice(randomIndex, 1)[0];
-          assignments[email] = codeGender;
-          saveToSheet(email, codeGender);
-        }
-        localStorage.setItem("assignments", JSON.stringify(assignments));
-        showPopup("🎲 Reshuffled and saved to a clean Sheet2!");
-      })
-      .catch(err => console.error("Error:", err));
-    }
-
-    function clearEntries() {
-      localStorage.removeItem("assignments");
-      assignments = {};
-      document.getElementById("emailList").value = "";
-      document.getElementById("codeList").value = "";
-      showPopup("🧹 All local entries cleared!");
-    }
-
-    function checkAssignment() {
-      const email = document.getElementById("userEmail").value.trim();
-      const resultDiv = document.getElementById("userResult");
-      if (!email) return showPopup("📧 Please enter your email.");
-
-      const assignment = assignments[email];
-      if (assignment) {
-        resultDiv.innerHTML = `<h3>The shadows whisper... Your match is:</h3><p>${assignment}</p>`;
-      } else {
-        resultDiv.innerHTML = `<p>👻 No pairing found for this email... yet.</p>`;
-      }
-      resultDiv.classList.remove("hidden");
-    }
-
-    function saveToSheet(email, codeGender) {
-      const [codeName, gender] = codeGender.split(" - ").map(v => v.trim());
-      fetch(scriptURL, {
-        method: "POST",
-        body: new URLSearchParams({
-          action: "saveEntry",
-          email: email,
-          codeName: codeName,
-          gender: gender
-        })
-      })
-      .then(res => res.text())
-      .then(data => console.log("Saved to Sheet2:", data))
-      .catch(err => console.error("Error:", err));
-    }
-
-    function showPopup(message) {
-      const modal = document.getElementById("popupModal");
-      const msg = document.getElementById("modalMessage");
-      msg.innerHTML = message;
-      modal.classList.add("show");
-      setTimeout(() => modal.classList.remove("show"), 2000);
-    }
-
-    function showConfirm(message, onConfirm) {
-      const modal = document.getElementById("confirmModal");
-      const text = document.getElementById("confirmText");
-      const yesBtn = document.getElementById("confirmYes");
-      const noBtn = document.getElementById("confirmNo");
-
-      text.textContent = message;
-      modal.classList.add("show");
-
-      yesBtn.onclick = () => {
-        modal.classList.remove("show");
-        onConfirm();
-      };
-      noBtn.onclick = () => modal.classList.remove("show");
-    }
+    spinBtn.addEventListener('click', spinWheel);
   </script>
 </body>
 </html>
