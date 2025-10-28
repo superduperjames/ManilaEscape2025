@@ -1,427 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ghoul Roulette — Assignments</title>
   <style>
-    :root{
-      --panel-bg: rgba(0,0,0,0.72);
-      --accent: #8a2be2;
-      --muted: rgba(255,255,255,0.85);
-      --mono: "Courier New", monospace;
-    }
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#000;color:#fff}
-    body{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
-      background-image: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif');
-      background-size:cover;
-      background-position:center;
-      backdrop-filter: blur(2px);
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') center/cover no-repeat fixed;
+      color: #f5f5f5;
+      text-align: center;
+      margin: 0;
+      min-height: 100vh;
+      backdrop-filter: blur(5px);
     }
 
-    .card{
-      width:100%;
-      max-width:920px;
-      background:var(--panel-bg);
-      border-radius:14px;
-      padding:28px;
-      box-shadow:0 10px 40px rgba(0,0,0,0.6);
-      display:grid;
-      grid-template-columns: 1fr 420px;
-      gap:20px;
-      align-items:start;
+    .container {
+      max-width: 900px;
+      margin: 80px auto;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
     }
 
-    h1{margin:0 0 6px 0;font-size:20px;letter-spacing:0.6px}
-    p.lead{margin:0 0 16px 0;color:var(--muted);font-size:14px}
-
-    /* user box */
-    .userBox{
-      padding:18px;
-      background:rgba(255,255,255,0.03);
-      border-radius:10px;
-      min-height:200px;
+    h1 {
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 20px;
     }
-    .userBox label{display:block;margin-bottom:8px;font-weight:600}
-    .userBox input[type="email"]{
-      width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;font-family:var(--mono);
+
+    textarea, input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+      font-size: 14px;
+      font-family: monospace;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
     }
-    .userBox button{
-      margin-top:12px;padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;
+
+    textarea::placeholder, input::placeholder {
+      color: #ccc;
     }
-    #userResult{margin-top:14px;padding:12px;border-radius:8px;background:rgba(255,255,255,0.03);display:none}
 
-    /* admin column */
-    .adminPanel{padding:18px;background:rgba(255,255,255,0.02);border-radius:10px}
-    .adminPanel label{display:block;margin-top:10px;margin-bottom:6px;font-weight:600}
-    .adminPanel textarea{width:100%;min-height:92px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;font-family:var(--mono)}
-    .adminPanel input[type="password"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    .controls button{padding:10px 12px;border-radius:8px;border:none;cursor:pointer;background:#fff;color:#000;font-weight:700}
-    .controls .ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.06)}
-    .preview{margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);font-family:var(--mono);font-size:13px;max-height:220px;overflow:auto;white-space:pre-wrap;color:var(--muted)}
+    button {
+      background: #a855f7;
+      border: none;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-    .tiny{font-size:12px;color:var(--muted);margin-top:8px}
-    .hide{display:none}
+    button:hover {
+      background: #9333ea;
+    }
 
-    /* responsive */
-    @media (max-width:940px){
-      .card{grid-template-columns:1fr; padding:20px}
+    .row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .box {
+      flex: 1 1 45%;
+      text-align: left;
+    }
+
+    .result-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+
+    small {
+      color: #aaa;
+    }
+
+    .admin-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 12px;
+      color: #ccc;
+      cursor: pointer;
+    }
+
+    #loginPopup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #loginPopup div {
+      background: #111;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    #loginPopup input {
+      width: 200px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
+  <div class="admin-btn" onclick="showLogin()">Admin Login</div>
 
-  <div class="card" role="application" aria-label="Ghoul Roulette assignments app">
-
-    <!-- LEFT: user lookup -->
+  <div id="loginPopup">
     <div>
-      <h1>Find Your Assigned Ghoul</h1>
-      <p class="lead">Type your email and reveal your assigned codename & gender (if assigned).</p>
-
-      <div class="userBox" aria-live="polite">
-        <label for="userEmail">Your Email</label>
-        <input id="userEmail" type="email" placeholder="you@example.com" autocomplete="email" />
-        <button id="revealBtn" type="button">Reveal My Codename</button>
-
-        <div id="userResult" role="status" aria-atomic="true"></div>
-
-        <p class="tiny">If you are admin, click <strong>Admin Login</strong> on the right.</p>
-      </div>
-    </div>
-
-    <!-- RIGHT: admin -->
-    <div>
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <h1 style="font-size:16px;margin-bottom:0">Admin — Generate Assignments</h1>
-          <p class="tiny" style="margin-top:4px">Password-protected — generates random pairings and saves them to <strong>Sheet2</strong>.</p>
-        </div>
-        <div>
-          <button id="showLogin" class="ghost" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.06)">Admin Login</button>
-        </div>
-      </div>
-
-      <div id="loginArea" class="adminPanel hide" aria-hidden="true">
-        <label for="adminPassword">Admin Password</label>
-        <input id="adminPassword" type="password" placeholder="Enter password" />
-        <div class="controls">
-          <button id="adminEnter">Enter</button>
-          <button id="loginCancel" class="ghost">Cancel</button>
-        </div>
-      </div>
-
-      <div id="adminArea" class="adminPanel hide" aria-hidden="true">
-        <label for="emails">Emails (comma or newline separated)</label>
-        <textarea id="emails" placeholder="james@email.com, friend@domain.com OR one per line"></textarea>
-
-        <label for="codenames">Codenames & Gender (one per line; example:<br><span style="opacity:0.8;font-family:var(--mono)">Phantom - Male</span>)</label>
-        <textarea id="codenames" placeholder="Phantom - Male\nLuna - Female\nPantomina - Female"></textarea>
-
-        <div class="controls">
-          <button id="generateBtn">Generate Assignments & Save to Sheet2</button>
-          <button id="downloadBtn" class="ghost">Download CSV (local)</button>
-          <button id="resetBtn" class="ghost">Reset Local</button>
-        </div>
-
-        <div id="status" class="tiny" style="margin-top:10px"></div>
-
-        <div id="preview" class="preview">Preview will appear here after typing lists.</div>
-      </div>
-
+      <h3>Enter Admin Password</h3>
+      <input type="password" id="adminPassword" placeholder="••••••••">
+      <br><br>
+      <button onclick="checkAdmin()">Login</button>
     </div>
   </div>
 
-<script>
-/*
-  Full client HTML:
-  - Uses your provided Web App URL to save and fetch assignments for Sheet2.
-  - Sheet column headers expected: Email | Assigned Code Name | Assigned Gender
-  - POST payload sends rows as arrays: [ email, assignedCodename, assignedGender ]
-  - GET is called with ?email=...&sheetName=Sheet2 and expects JSON with either:
-      { status: "found", codename: "...", gender: "..." }
-    or { status: "not_found" } / { status: "error", message: "..." }
-*/
+  <div class="container">
+    <h1>Find Your Assigned Ghoul</h1>
+    <input type="email" id="emailInput" placeholder="you@example.com" />
+    <button onclick="revealAssignment()">Reveal My Codename</button>
+    <div id="result" class="result-box"></div>
 
-const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbySgPWk1WSX-bgb0WaV3kXTMuWE1bcRiHZ4vtwkNDoDTE0wfi5D1wFTGd6kvWPf_EIX/exec";
-const ADMIN_PASSWORD = "escape2025";
-const TARGET_SHEET = "Sheet2"; // sheet where data should be saved
+    <hr style="margin: 40px 0; border: 1px solid rgba(255,255,255,0.1);">
 
-// UI elements
-const showLogin = document.getElementById('showLogin');
-const loginArea = document.getElementById('loginArea');
-const adminArea = document.getElementById('adminArea');
-const adminEnter = document.getElementById('adminEnter');
-const loginCancel = document.getElementById('loginCancel');
-const adminPassword = document.getElementById('adminPassword');
-const emailsEl = document.getElementById('emails');
-const codenamesEl = document.getElementById('codenames');
-const previewEl = document.getElementById('preview');
-const statusEl = document.getElementById('status');
-const generateBtn = document.getElementById('generateBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const resetBtn = document.getElementById('resetBtn');
+    <h1>Generate Assignments (Admin)</h1>
+    <div class="row">
+      <div class="box">
+        <label>Emails (comma or newline separated)</label>
+        <textarea id="emails" rows="5" placeholder="james@email.com, hello@email.com"></textarea>
+      </div>
+      <div class="box">
+        <label>Codenames & Gender (comma separated; e.g., Phantom - Male, Fairy - Female)</label>
+        <textarea id="codenames" rows="5" placeholder="Phantom - Male, Fairy - Female, Rico - Male"></textarea>
+      </div>
+    </div>
+    <button onclick="generateAssignments()">Generate Assignments</button>
+    <button onclick="downloadCSV()">Download CSV (local)</button>
+    <button onclick="resetLocal()">Reset Local</button>
 
-const userEmailEl = document.getElementById('userEmail');
-const revealBtn = document.getElementById('revealBtn');
-const userResultEl = document.getElementById('userResult');
+    <div id="output" class="result-box"></div>
+  </div>
 
-let assignments = JSON.parse(localStorage.getItem('assignments') || "{}");
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwBuOj0frBX9IX6y9xvPPvVM5DFCdbMuYaugo-0T6OXxUtClLHhdzk2PZ90f31w50ab/exec';
 
-// Utilities
-function parseEmails(raw){
-  if(!raw) return [];
-  return raw.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
-}
-function parseCodenames(raw){
-  if(!raw) return [];
-  return raw.split(/\n/).map(s=>s.trim()).filter(Boolean);
-}
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
-  }
-  return a;
-}
-function saveLocal(assignObj){
-  assignments = assignObj;
-  localStorage.setItem('assignments', JSON.stringify(assignments));
-}
-
-// Preview rendering
-function renderPreview(){
-  const ems = parseEmails(emailsEl.value);
-  const codes = parseCodenames(codenamesEl.value);
-  if(ems.length===0 || codes.length===0){
-    previewEl.textContent = "Enter both lists to see a preview (preview doesn't save).";
-    return;
-  }
-  const pool = shuffle(codes.slice());
-  const lines = [];
-  let idx = 0;
-  for(let i=0;i<ems.length;i++){
-    if(idx >= pool.length){
-      pool.push(...shuffle(codes.slice())); // allow reuse if more emails than codes
+    // === Admin Login ===
+    function showLogin() {
+      document.getElementById('loginPopup').style.display = 'flex';
     }
-    const pair = pool[idx++];
-    // accept "Codename - Gender" or "Codename, Gender" or "Codename | Gender"
-    const parts = pair.split(/\s*[-,|]\s*/);
-    const codename = parts[0]||pair;
-    const gender = parts[1]||"Unknown";
-    lines.push(`${ems[i]} → ${codename} (${gender})`);
-  }
-  previewEl.textContent = lines.join("\n");
-}
 
-// handlers for admin login
-showLogin.addEventListener('click', ()=>{
-  loginArea.classList.remove('hide');
-  loginArea.setAttribute('aria-hidden','false');
-  adminPassword.value = "";
-  adminPassword.focus();
-});
-loginCancel.addEventListener('click', ()=>{
-  loginArea.classList.add('hide');
-  loginArea.setAttribute('aria-hidden','true');
-});
-
-// admin enter
-adminEnter.addEventListener('click', ()=>{
-  if(adminPassword.value === ADMIN_PASSWORD){
-    loginArea.classList.add('hide');
-    adminArea.classList.remove('hide');
-    adminArea.setAttribute('aria-hidden','false');
-    // populate from localStorage if available
-    emailsEl.value = localStorage.getItem('admin_emails') || "";
-    codenamesEl.value = localStorage.getItem('admin_codenames') || "";
-    renderPreview();
-    statusEl.textContent = assignments && Object.keys(assignments).length ? `Loaded ${Object.keys(assignments).length} local assignment(s).` : "No local assignments loaded.";
-  } else {
-    alert("Wrong password. The spirits remain hidden.");
-  }
-});
-
-// live preview + save admin textareas locally so editing isn't lost
-emailsEl.addEventListener('input', ()=>{
-  localStorage.setItem('admin_emails', emailsEl.value);
-  renderPreview();
-});
-codenamesEl.addEventListener('input', ()=>{
-  localStorage.setItem('admin_codenames', codenamesEl.value);
-  renderPreview();
-});
-
-// Generate assignments and POST to Apps Script (Sheet2)
-generateBtn.addEventListener('click', async ()=>{
-  statusEl.textContent = "";
-  const ems = parseEmails(emailsEl.value);
-  const codes = parseCodenames(codenamesEl.value);
-  if(ems.length===0){ alert("Please enter at least one email."); return; }
-  if(codes.length===0){ alert("Please enter at least one codename/gender."); return; }
-
-  generateBtn.disabled = true;
-  generateBtn.textContent = "Generating...";
-  try {
-    // create shuffled pool and assign sequentially (reuse allowed)
-    const pool = shuffle(codes.slice());
-    const assignedMap = {};
-    let poolIdx = 0;
-    for(let i=0;i<ems.length;i++){
-      if(poolIdx >= pool.length){
-        pool.push(...shuffle(codes.slice()));
+    function checkAdmin() {
+      const pass = document.getElementById('adminPassword').value;
+      if (pass === 'escape2025') {
+        document.getElementById('loginPopup').style.display = 'none';
+        alert('Admin unlocked.');
+      } else {
+        alert('Incorrect password.');
       }
-      const pair = pool[poolIdx++];
-      const parts = pair.split(/\s*[-,|]\s*/);
-      const codename = parts[0] || pair;
-      const gender = parts[1] || "Unknown";
-      assignedMap[ems[i]] = { codename: codename.trim(), gender: gender.trim() };
     }
 
-    // persist locally
-    saveLocal(assignedMap);
+    // === Generate Assignments ===
+    async function generateAssignments() {
+      const emails = document.getElementById('emails').value.trim();
+      const codenameStr = document.getElementById('codenames').value.trim();
 
-    // Build rows to send to sheet with headers: Email, Assigned Code Name, Assigned Gender
-    const rows = [];
-    for(const em of Object.keys(assignedMap)){
-      const rec = assignedMap[em];
-      rows.push([em, rec.codename, rec.gender]);
+      if (!emails || !codenameStr) return alert('Please fill both fields.');
+
+      // Split codenames by comma
+      const codenameLines = codenameStr.split(',').map(s => s.trim()).filter(Boolean).join('\n');
+
+      document.getElementById('output').innerText = 'Generating...';
+
+      try {
+        const res = await fetch(`${scriptURL}?action=generateAssignments&emails=${encodeURIComponent(emails)}&codenames=${encodeURIComponent(codenameLines)}`);
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          const output = data.assignments.map(a => `${a.email} → ${a.codename} (${a.gender})`).join('\n');
+          document.getElementById('output').innerText = `Saved ${data.assignments.length} rows.\n\n${output}`;
+          localStorage.setItem('assignments', JSON.stringify(data.assignments));
+        } else {
+          document.getElementById('output').innerText = `Error: ${data.error || 'Unknown error'}`;
+        }
+      } catch (err) {
+        alert('Error connecting to Google Script.\n' + err);
+      }
     }
 
-    // payload: send sheetName + rows
-    const payload = {
-      action: 'appendRows',
-      sheetName: TARGET_SHEET,
-      rows: rows
-    };
+    // === Reveal Codename ===
+    async function revealAssignment() {
+      const email = document.getElementById('emailInput').value.trim();
+      if (!email) return alert('Enter your email first.');
 
-    statusEl.textContent = `Saving ${rows.length} rows to ${TARGET_SHEET}...`;
+      try {
+        const res = await fetch(`${scriptURL}?action=getAssignment&email=${encodeURIComponent(email)}`);
+        const data = await res.json();
 
-    // POST as JSON. IMPORTANT: your Apps Script must allow "Anyone" access & handle JSON.
-    const resp = await fetch(GAS_WEBAPP_URL, {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    // try to parse response
-    let json = null;
-    try { json = await resp.json(); } catch(e){ /* ignore parse fail */ }
-
-    if(resp.ok){
-      // success path (script should return {status: "success"} )
-      statusEl.textContent = (json && json.status) ? `Saved: ${json.status}${json.count ? ` — ${json.count} rows` : ""}` : "Saved to Google Sheet.";
-      previewEl.textContent = Object.keys(assignedMap).map(e => `${e} → ${assignedMap[e].codename} (${assignedMap[e].gender})`).join("\n");
-      alert("Assignments generated and sent to Sheet2.");
-    } else {
-      statusEl.textContent = `Server error: HTTP ${resp.status}. Assignments stored locally.`;
-      if(json && json.message) statusEl.textContent += ` ${json.message}`;
-      console.error("Server response:", json);
-      alert("Server returned an error. Assignments are saved locally in your browser.");
+        if (data.found) {
+          document.getElementById('result').innerText = `💀 ${data.codename} (${data.gender})`;
+        } else {
+          document.getElementById('result').innerText = data.message;
+        }
+      } catch (err) {
+        alert('Error connecting to Google Script.\n' + err);
+      }
     }
-  } catch(err){
-    console.error("Failed to save:", err);
-    statusEl.textContent = "Network/CORS error while saving. Assignments saved locally.";
-    alert("Error connecting to Google Script: " + err.message + "\nCheck Apps Script deployment (Execute as: Me, Who has access: Anyone) and CORS settings.");
-  } finally {
-    generateBtn.disabled = false;
-    generateBtn.textContent = "Generate Assignments & Save to Sheet2";
-  }
-});
 
-// Download CSV of local assignments
-downloadBtn.addEventListener('click', ()=>{
-  const data = JSON.parse(localStorage.getItem('assignments') || JSON.stringify(assignments || {}));
-  const keys = Object.keys(data || {});
-  if(keys.length === 0){
-    alert("No local assignments found. Generate first.");
-    return;
-  }
-  const header = ['Email','Assigned Code Name','Assigned Gender'];
-  const lines = [header];
-  for(const k of keys){
-    const r = data[k];
-    lines.push([k, r.codename, r.gender]);
-  }
-  const csv = lines.map(row => row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'assignments.csv';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-});
+    // === CSV Download ===
+    function downloadCSV() {
+      const data = JSON.parse(localStorage.getItem('assignments') || '[]');
+      if (data.length === 0) return alert('No local data to download.');
 
-// Reset local assignments
-resetBtn.addEventListener('click', ()=>{
-  if(!confirm("Remove local assignments stored in this browser?")) return;
-  localStorage.removeItem('assignments');
-  assignments = {};
-  statusEl.textContent = "Local assignments cleared.";
-  previewEl.textContent = "Preview cleared.";
-});
+      let csv = 'Email,Assigned Code Name,Assigned Gender\n';
+      data.forEach(r => csv += `${r.email},${r.codename},${r.gender}\n`);
 
-// USER: fetch assignment by email from Apps Script (GET)
-revealBtn.addEventListener('click', async ()=>{
-  const email = userEmailEl.value.trim();
-  if(!email){ alert("Please enter your email."); return; }
-
-  userResultEl.style.display = 'block';
-  userResultEl.textContent = "Summoning your assigned codename...";
-  try {
-    const url = `${GAS_WEBAPP_URL}?email=${encodeURIComponent(email)}&sheetName=${encodeURIComponent(TARGET_SHEET)}`;
-    const res = await fetch(url, { method:'GET', mode: 'cors' });
-    const j = await res.json();
-
-    if(j.status === 'found' || j.status === 'found_record'){
-      // support both "found" and legacy keys
-      const codename = j.codename || j.assignedCodename || j['Assigned Code Name'] || '';
-      const gender = j.gender || j.assignedGender || j['Assigned Gender'] || '';
-      userResultEl.innerHTML = `<strong>Your Ghoul Codename:</strong><br><span style="font-family:var(--mono);font-size:16px">${codename} (${gender})</span>`;
-    } else if (j.status === 'not_found'){
-      userResultEl.textContent = "No assignment found for that email. The spirits remain silent.";
-    } else {
-      userResultEl.textContent = "No assignment found (unexpected response).";
-      console.warn("Unexpected response from script:", j);
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ghoul_assignments.csv';
+      a.click();
     }
-  } catch(err){
-    console.error("Lookup error:", err);
-    // fallback to local assignments if present
-    const local = JSON.parse(localStorage.getItem('assignments') || "{}");
-    if(local[email]){
-      userResultEl.innerHTML = `<strong>Your Ghoul Codename (local):</strong><br><span style="font-family:var(--mono)">${local[email].codename} (${local[email].gender})</span>`;
-      userResultEl.style.border = "1px dashed rgba(255,255,255,0.08)";
-      statusEl.textContent = "Lookup failed (network/CORS). Served local copy if available.";
-    } else {
-      userResultEl.textContent = "Connection error. Unable to fetch assignment. Try again later.";
-    }
-  }
-});
 
-// initialize preview and load local assignments count
-(function init(){
-  try{
-    const stored = JSON.parse(localStorage.getItem('assignments') || "{}");
-    assignments = stored || {};
-    const keys = Object.keys(assignments || {});
-    if(keys.length) statusEl.textContent = `Loaded ${keys.length} assignment(s) from local storage.`;
-    // if admin had typed lists previously, populate
-    emailsEl.value = localStorage.getItem('admin_emails') || "";
-    codenamesEl.value = localStorage.getItem('admin_codenames') || "";
-    renderPreview();
-  }catch(e){
-    console.warn("Init error:", e);
-  }
-})();
-</script>
+    function resetLocal() {
+      localStorage.removeItem('assignments');
+      document.getElementById('output').innerText = '';
+      alert('Local data cleared.');
+    }
+  </script>
 </body>
 </html>
