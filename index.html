@@ -3,276 +3,227 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manila Escape Pairing</title>
+  <title>Manila Escape Ghoul Swap Spinner</title>
   <style>
     body {
-      background: #0d0d0d;
-      color: #f1f1f1;
       font-family: 'Poppins', sans-serif;
+      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759502727/_James%20Assets/.test%20app%20assets/MML%20October%202025/218016_small-ezgif.com-video-to-gif-converter.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
       text-align: center;
       margin: 0;
       padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
     }
-    h1 { margin-top: 60px; }
 
-    /* Discreet Admin Login Button (top-right corner) */
-    #adminLoginBtn {
-      position: fixed;
-      top: 10px;
-      right: 15px;
-      background: transparent;
-      color: #ccc;
-      border: none;
-      font-size: 14px;
-      cursor: pointer;
-      text-decoration: underline;
-      opacity: 0.7;
-      transition: opacity 0.3s;
+    h1 {
+      font-size: 2em;
+      text-shadow: 2px 2px 5px black;
     }
-    #adminLoginBtn:hover { opacity: 1; color: white; }
 
-    input, textarea, button {
-      margin: 10px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
+    input, textarea {
+      padding: 8px;
+      margin: 8px;
+      width: 80%;
       border: none;
+      border-radius: 6px;
+      font-size: 1em;
     }
-    input, textarea { width: 80%; max-width: 500px; }
+
     button {
-      cursor: pointer;
-      background: #ff2e63;
+      padding: 10px 16px;
+      margin: 8px;
+      background-color: #9c27b0;
+      border: none;
       color: white;
-      transition: background 0.3s;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
     }
-    button:hover { background: #e61b50; }
-    .admin-panel {
-      display: none;
-      margin-top: 30px;
-      border-top: 1px solid #333;
-      padding-top: 20px;
-    }
-    .result-box {
-      margin-top: 30px;
-      background: #1a1a1a;
-      display: inline-block;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    .admin-btns {
-      margin-top: 15px;
-    }
-    .hidden { display: none; }
 
-    /* Modal styling */
+    button:hover {
+      background-color: #ba68c8;
+    }
+
+    #adminBtn {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.2);
+      font-size: 0.8em;
+      padding: 6px 10px;
+    }
+
+    #adminPanel {
+      display: none;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      margin: 0 auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
+
     .modal {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
+      z-index: 9999;
     }
-    .modal.show {
-      visibility: visible;
-      opacity: 1;
-    }
+
     .modal-content {
       background: #222;
-      padding: 20px 40px;
-      border-radius: 12px;
-      color: #fff;
+      padding: 20px;
+      border-radius: 10px;
       text-align: center;
-      box-shadow: 0 0 15px #ff2e63;
-      max-width: 90%;
     }
-    .modal-content button {
-      background: #ff2e63;
-      margin-top: 15px;
+
+    .modal button {
+      margin: 10px;
     }
   </style>
 </head>
 <body>
-  <button id="adminLoginBtn" onclick="toggleAdminLogin()">Admin Login</button>
 
-  <h1>🎃 Manila Escape Pairing System</h1>
+  <button id="adminBtn">Admin Login</button>
 
-  <!-- User Section -->
-  <div id="user-section">
-    <p>Enter your email to see your assigned Code Name:</p>
+  <div id="mainContent">
+    <h1>🎃 Ghoul Swap Spinner 🎃</h1>
+    <p>Enter your email below and find out who the spinner has chosen for you...</p>
     <input type="email" id="userEmail" placeholder="Enter your email" required />
-    <button onclick="checkAssignment()">Check Assignment</button>
-    <div id="userResult" class="result-box hidden"></div>
+    <br>
+    <button onclick="checkAssignment()">Spin!</button>
+    <p id="result"></p>
   </div>
 
-  <!-- Admin Login Popup -->
-  <div id="admin-login" class="hidden">
-    <p style="margin-top:40px;">🔐 Admin Login:</p>
-    <input type="password" id="adminPassword" placeholder="Enter password" />
-    <button onclick="loginAdmin()">Login</button>
-  </div>
-
-  <!-- Admin Panel -->
-  <div id="adminPanel" class="admin-panel">
-    <h2>Admin Panel</h2>
-    <textarea id="emailList" rows="4" placeholder="Email entries (comma-separated)"></textarea><br>
-    <textarea id="codeList" rows="4" placeholder="Codenames and Gender (comma-separated)"></textarea><br>
-    <div class="admin-btns">
-      <button onclick="generateAssignments()">Generate Assignments</button>
-      <button onclick="confirmReshuffle()">Reshuffle</button>
-      <button onclick="confirmClearEntries()">Clear Entries</button>
+  <!-- Admin Login Modal -->
+  <div class="modal" id="adminLoginModal">
+    <div class="modal-content">
+      <h2>Admin Login</h2>
+      <input type="password" id="adminPass" placeholder="Enter admin password" />
+      <br>
+      <button onclick="checkAdmin()">Login</button>
+      <button onclick="closeModal('adminLoginModal')">Cancel</button>
+      <p id="loginError" style="color:red;"></p>
     </div>
-  </div>
-
-  <!-- Popup Modal -->
-  <div id="popupModal" class="modal">
-    <div class="modal-content" id="modalMessage"></div>
   </div>
 
   <!-- Confirmation Modal -->
-  <div id="confirmModal" class="modal">
-    <div class="modal-content" id="confirmContent">
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
       <p id="confirmText"></p>
       <button id="confirmYes">Yes</button>
-      <button id="confirmNo">Cancel</button>
+      <button onclick="closeModal('confirmModal')">Cancel</button>
     </div>
   </div>
 
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwdh-RqSOToSZ5kapVz1tgcjQ2xuJQPlgK6T5_sVSEy_nVifEnCAaZ30BLDxRBWLXUilA/exec";
-    let assignments = JSON.parse(localStorage.getItem('assignments') || '{}');
+  <!-- Admin Panel -->
+  <div id="adminPanel">
+    <h2>Admin Control Panel</h2>
+    <textarea id="emailList" placeholder="Email entries (comma-separated)"></textarea><br>
+    <textarea id="codeList" placeholder="Codenames and Gender (comma-separated)"></textarea><br>
+    <button onclick="generateAssignments()">Generate Assignments</button>
+    <button onclick="showConfirm('Reshuffle all entries?', reshuffle)">Reshuffle</button>
+    <button onclick="showConfirm('Clear all entries?', clearEntries)">Clear Entries</button>
+    <br><br>
+    <button onclick="closeAdmin()">Close</button>
+    <p id="adminStatus"></p>
+  </div>
 
-    function toggleAdminLogin() {
-      document.getElementById("admin-login").classList.toggle("hidden");
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwdh-RqSOToSZ5kapVz1tgcjQ2xuJQPlgK6T5_sVSEy_nVifEnCAaZ30BLDxRBWLXUilA/exec';
+    const ADMIN_PASSWORD = 'escape2025';
+
+    document.getElementById('adminBtn').addEventListener('click', () => {
+      document.getElementById('adminLoginModal').style.display = 'flex';
+    });
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
     }
 
-    function loginAdmin() {
-      const pass = document.getElementById("adminPassword").value.trim();
-      if (pass === "escape2025") {
-        document.getElementById("adminPanel").style.display = "block";
-        document.getElementById("admin-login").style.display = "none";
-        showPopup("✅ Admin access granted.");
+    function checkAdmin() {
+      const pass = document.getElementById('adminPass').value;
+      if (pass === ADMIN_PASSWORD) {
+        closeModal('adminLoginModal');
+        document.getElementById('adminPanel').style.display = 'block';
       } else {
-        showPopup("❌ Incorrect password.");
+        document.getElementById('loginError').textContent = 'Incorrect password!';
       }
+    }
+
+    function closeAdmin() {
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+
+    function showConfirm(text, callback) {
+      document.getElementById('confirmText').textContent = text;
+      const yesBtn = document.getElementById('confirmYes');
+      yesBtn.onclick = () => { closeModal('confirmModal'); callback(); };
+      document.getElementById('confirmModal').style.display = 'flex';
     }
 
     function generateAssignments() {
-      const emails = document.getElementById("emailList").value.split(",").map(e => e.trim()).filter(Boolean);
-      const codes = document.getElementById("codeList").value.split(",").map(c => c.trim()).filter(Boolean);
-      if (emails.length === 0 || codes.length === 0) return showPopup("⚠️ Please enter both email and code lists.");
-
-      for (let email of emails) {
-        if (!assignments[email]) {
-          const randomIndex = Math.floor(Math.random() * codes.length);
-          const codeGender = codes.splice(randomIndex, 1)[0];
-          assignments[email] = codeGender;
-          saveToSheet(email, codeGender);
-        }
+      const emails = document.getElementById('emailList').value.split(',').map(e => e.trim()).filter(Boolean);
+      const codes = document.getElementById('codeList').value.split(',').map(e => e.trim()).filter(Boolean);
+      if (emails.length === 0 || codes.length === 0) {
+        alert('Please enter both lists.');
+        return;
       }
-      localStorage.setItem("assignments", JSON.stringify(assignments));
-      showPopup("✅ Assignments generated and saved to Sheet2!");
-    }
 
-    // Confirmation modals
-    function confirmReshuffle() {
-      showConfirm("This will clear Sheet2 and reshuffle all assignments. Continue?", reshuffleAssignments);
-    }
+      // Shuffle and pair randomly
+      const shuffled = [...codes].sort(() => Math.random() - 0.5);
+      const results = emails.map((email, i) => ({
+        email: email,
+        result: shuffled[i % shuffled.length]
+      }));
 
-    function confirmClearEntries() {
-      showConfirm("This will clear all local entries (not Sheet2). Continue?", clearEntries);
-    }
-
-    function reshuffleAssignments() {
-      const emails = Object.keys(assignments);
-      const codes = document.getElementById("codeList").value.split(",").map(c => c.trim()).filter(Boolean);
-      if (emails.length === 0 || codes.length === 0) return showPopup("⚠️ Need existing assignments and code list.");
-
-      showPopup("♻️ Clearing Sheet2...");
       fetch(scriptURL, {
-        method: "POST",
-        body: new URLSearchParams({ action: "clearSheet2" })
+        method: 'POST',
+        body: JSON.stringify({ type: 'adminReplace', entries: results }),
       })
-      .then(() => {
-        assignments = {};
-        for (let email of emails) {
-          const randomIndex = Math.floor(Math.random() * codes.length);
-          const codeGender = codes.splice(randomIndex, 1)[0];
-          assignments[email] = codeGender;
-          saveToSheet(email, codeGender);
-        }
-        localStorage.setItem("assignments", JSON.stringify(assignments));
-        showPopup("🎲 Reshuffled and saved to a clean Sheet2!");
-      })
-      .catch(err => console.error("Error:", err));
+      .then(() => document.getElementById('adminStatus').textContent = 'Assignments generated and saved!')
+      .catch(err => document.getElementById('adminStatus').textContent = 'Error saving assignments.');
+    }
+
+    function reshuffle() {
+      generateAssignments();
     }
 
     function clearEntries() {
-      localStorage.removeItem("assignments");
-      assignments = {};
-      document.getElementById("emailList").value = "";
-      document.getElementById("codeList").value = "";
-      showPopup("🧹 All local entries cleared!");
+      fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ type: 'clearAll' }),
+      })
+      .then(() => document.getElementById('adminStatus').textContent = 'All entries cleared!')
+      .catch(() => document.getElementById('adminStatus').textContent = 'Error clearing entries.');
     }
 
     function checkAssignment() {
-      const email = document.getElementById("userEmail").value.trim();
-      const resultDiv = document.getElementById("userResult");
-      if (!email) return showPopup("📧 Please enter your email.");
-
-      const assignment = assignments[email];
-      if (assignment) {
-        resultDiv.innerHTML = `<h3>Your Result</h3><p>${assignment}</p>`;
-      } else {
-        resultDiv.innerHTML = `<p>No assignment found for this email yet.</p>`;
+      const email = document.getElementById('userEmail').value.trim().toLowerCase();
+      if (!email) {
+        alert('Please enter a valid email.');
+        return;
       }
-      resultDiv.classList.remove("hidden");
-    }
-
-    function saveToSheet(email, codeGender) {
-      const [codeName, gender] = codeGender.split(" - ").map(v => v.trim());
-      fetch(scriptURL, {
-        method: "POST",
-        body: new URLSearchParams({
-          action: "saveEntry",
-          email: email,
-          codeName: codeName,
-          gender: gender
-        })
-      })
-      .then(res => res.text())
-      .then(data => console.log("Saved to Sheet2:", data))
-      .catch(err => console.error("Error:", err));
-    }
-
-    function showPopup(message) {
-      const modal = document.getElementById("popupModal");
-      const msg = document.getElementById("modalMessage");
-      msg.innerHTML = message;
-      modal.classList.add("show");
-      setTimeout(() => modal.classList.remove("show"), 2000);
-    }
-
-    function showConfirm(message, onConfirm) {
-      const modal = document.getElementById("confirmModal");
-      const text = document.getElementById("confirmText");
-      const yesBtn = document.getElementById("confirmYes");
-      const noBtn = document.getElementById("confirmNo");
-
-      text.textContent = message;
-      modal.classList.add("show");
-
-      yesBtn.onclick = () => {
-        modal.classList.remove("show");
-        onConfirm();
-      };
-      noBtn.onclick = () => modal.classList.remove("show");
+      fetch(scriptURL + '?action=download')
+        .then(res => res.text())
+        .then(csv => {
+          const rows = csv.split('\n').map(r => r.split(','));
+          const match = rows.find(r => r[0].replace(/"/g, '').toLowerCase() === email);
+          document.getElementById('result').textContent = match
+            ? `Your code name: ${match[1].replace(/"/g, '')}`
+            : 'No assignment found yet.';
+        });
     }
   </script>
+
 </body>
 </html>
