@@ -98,7 +98,7 @@
 
   <div id="mainContent">
     <h1>🕷️ Ghoul Swap Spinner 🕸️</h1>
-    <p>Enter your email below and find out who the spinner has chosen for you...</p>
+    <p>Step closer... Enter your email and see who the spinner has chosen to cross your path…</p>
     <input type="email" id="userEmail" placeholder="Enter your email" required />
     <br>
     <button onclick="checkAssignment()">Spin!</button>
@@ -221,7 +221,7 @@
           const match = rows.find(r => r[0].replace(/"/g, '').toLowerCase() === email);
           document.getElementById('result').textContent = match
             ? `Your code name: ${match[1].replace(/"/g, '')}`
-            : 'Your fate cannot be forseen...yet.';
+            : 'The spirits remain silent... Your fate is yet to be revealed.';
         });
     }
   </script>
