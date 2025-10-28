@@ -1,261 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spooky Roulette</title>
-<style>
-  body {
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
-    background: #000;
-    color: #fff;
-    font-family: 'Courier New', monospace;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ghoul Roulette Assignments</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif');
+      background-size: cover;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 40px;
+      backdrop-filter: blur(4px);
+    }
 
-  /* --- Ghostly Mist --- */
-  .mist, .mist::before, .mist::after {
-    content: "";
-    position: absolute;
-    top: 0; left: 0;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%),
-                radial-gradient(circle at 70% 70%, rgba(255,255,255,0.1), transparent 70%);
-    mix-blend-mode: lighten;
-    opacity: 0.25;
-    animation: fogMove 40s linear infinite;
-    pointer-events: none;
-  }
-  .mist::before {
-    animation: fogMove2 60s linear infinite;
-    opacity: 0.3;
-  }
-  .mist::after {
-    animation: fogMove3 90s linear infinite;
-    opacity: 0.2;
-  }
+    h1 {
+      text-shadow: 2px 2px 10px #000;
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
 
-  @keyframes fogMove {
-    from { transform: translateX(-10%) translateY(-10%) scale(1.2); }
-    to { transform: translateX(10%) translateY(10%) scale(1.3); }
-  }
-  @keyframes fogMove2 {
-    from { transform: translateX(10%) translateY(0%) scale(1.1); }
-    to { transform: translateX(-10%) translateY(5%) scale(1.25); }
-  }
-  @keyframes fogMove3 {
-    from { transform: translateX(-5%) translateY(5%) scale(1); }
-    to { transform: translateX(5%) translateY(-5%) scale(1.2); }
-  }
+    .container {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 25px 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+      text-align: center;
+    }
 
-  .container {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-  }
+    textarea, input[type="email"], input[type="password"] {
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      padding: 10px;
+      font-family: 'Courier New', monospace;
+      resize: vertical;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      margin-top: 10px;
+      font-size: 1em;
+    }
 
-  h1 {
-    margin-bottom: 10px;
-    font-size: 2em;
-    letter-spacing: 2px;
-  }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+      margin-bottom: 5px;
+    }
 
-  p.intro {
-    font-size: 1.1em;
-    color: #ddd;
-    margin-bottom: 20px;
-    animation: fadeIn 3s ease;
-  }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #a600ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
 
-  input[type="email"], button {
-    padding: 10px;
-    margin: 10px;
-    border: none;
-    font-size: 16px;
-    border-radius: 6px;
-  }
+    button:hover {
+      background-color: #7b00c7;
+    }
 
-  input[type="email"] {
-    width: 260px;
-  }
+    #result, #userResult {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+      display: none;
+    }
 
-  button {
-    cursor: pointer;
-    background: #fff;
-    color: #000;
-    transition: all 0.3s ease;
-  }
+    .hidden { display: none; }
 
-  button:hover {
-    background: #ccc;
-  }
-
-  #resultBox {
-    display: none;
-    background: #fff;
-    color: #000;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-    animation: fadeIn 1s ease forwards;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Admin link */
-  #adminLink {
-    position: fixed;
-    top: 10px;
-    right: 20px;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-    opacity: 0.7;
-    z-index: 3;
-  }
-  #adminLink:hover {
-    opacity: 1;
-    text-decoration: underline;
-  }
-
-  /* Admin panel */
-  #adminPanel {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255,255,255,0.95);
-    color: #000;
-    padding: 20px;
-    border-radius: 10px;
-    z-index: 4;
-    width: 300px;
-  }
-
-  #adminPanel textarea {
-    width: 100%;
-    height: 60px;
-    margin-bottom: 10px;
-  }
-
-  #closeAdmin {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-</style>
+  </style>
 </head>
 <body>
 
-<div class="mist"></div>
+  <!-- USER SECTION -->
+  <div class="container" id="userSection">
+    <h1>Find Your Ghoul Identity</h1>
+    <p>Enter your email... and let fate whisper your assigned name.</p>
+    <input type="email" id="userEmail" placeholder="Type your email..." />
+    <button onclick="fetchAssignment()">Reveal My Codename</button>
 
-<!-- Soft eerie background sound -->
-<audio autoplay loop>
-  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_16a6a84e64.mp3?filename=whispers-ambient-14032.mp3" type="audio/mpeg">
-</audio>
+    <div id="userResult"></div>
 
-<div id="adminLink">👻 Admin Login</div>
-
-<div class="container">
-  <h1>🎡 Spooky Roulette</h1>
-  <p class="intro">Enter if you dare… spin to reveal your secret identity.</p>
-  <input type="email" id="emailInput" placeholder="Enter your email...">
-  <button id="spinBtn">Spin</button>
-  <div id="resultBox"></div>
-</div>
-
-<!-- Admin panel -->
-<div id="adminPanel">
-  <span id="closeAdmin">✖</span>
-  <h3>Admin Panel</h3>
-  <input type="password" id="adminPassword" placeholder="Enter password">
-  <button id="loginBtn">Login</button>
-  
-  <div id="adminContent" style="display:none;">
-    <p><b>Emails (comma-separated):</b></p>
-    <textarea id="emailList"></textarea>
-    <p><b>Results (codename, gender — one per line):</b></p>
-    <textarea id="resultList"></textarea>
-    <button id="generateBtn">Generate Assignments</button>
-    <button id="resetBtn">Reset</button>
+    <p style="margin-top:30px; font-size:0.9em; opacity:0.8;">
+      Admin? <a href="#" onclick="showLogin()">Click here</a>
+    </p>
   </div>
-</div>
 
-<script>
-  const adminLink = document.getElementById('adminLink');
-  const adminPanel = document.getElementById('adminPanel');
-  const closeAdmin = document.getElementById('closeAdmin');
-  const loginBtn = document.getElementById('loginBtn');
-  const adminContent = document.getElementById('adminContent');
-  const emailList = document.getElementById('emailList');
-  const resultList = document.getElementById('resultList');
-  const generateBtn = document.getElementById('generateBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const spinBtn = document.getElementById('spinBtn');
-  const resultBox = document.getElementById('resultBox');
-  const emailInput = document.getElementById('emailInput');
+  <!-- ADMIN LOGIN -->
+  <div class="container hidden" id="loginSection">
+    <h1>Admin Login</h1>
+    <p>Enter the secret incantation to access the pairing ritual.</p>
+    <input type="password" id="adminPassword" placeholder="Enter password..." />
+    <br />
+    <button onclick="checkLogin()">Enter</button>
+  </div>
 
-  let assignments = JSON.parse(localStorage.getItem("assignments")) || {};
-  let emails = [];
-  let results = [];
+  <!-- ADMIN SECTION -->
+  <div class="container hidden" id="adminSection">
+    <h1>Generate Assignments</h1>
+    <p>Enter a list of emails and a list of codenames with genders. One per line.</p>
 
-  adminLink.onclick = () => adminPanel.style.display = 'block';
-  closeAdmin.onclick = () => adminPanel.style.display = 'none';
+    <label for="emails">Emails</label>
+    <textarea id="emails" placeholder="e.g.\njack@example.com\nluna@example.com"></textarea>
 
-  loginBtn.onclick = () => {
-    if (document.getElementById('adminPassword').value === 'escape2025') {
-      adminContent.style.display = 'block';
-    } else {
-      alert("Wrong password!");
+    <label for="codenames">Codenames & Gender</label>
+    <textarea id="codenames" placeholder="e.g.\nPhantom - Male\nWhisper - Female"></textarea>
+
+    <button onclick="generateAssignments()">Generate Assignments</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw2nwRX3YZDxY8MBnw4hIX7ag98RwPavKL20D4pmOP0IILYlfIfO4uAjy9IrIkRDdGu/exec";
+    const ADMIN_PASSWORD = "escape2025";
+
+    function showLogin() {
+      document.getElementById("userSection").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
     }
-  };
 
-  generateBtn.onclick = () => {
-    emails = emailList.value.split(',').map(e => e.trim()).filter(Boolean);
-    results = resultList.value.split('\n').map(r => r.trim()).filter(Boolean);
-    assignments = {};
-    emails.forEach(e => {
-      const randomResult = results[Math.floor(Math.random() * results.length)];
-      assignments[e] = randomResult;
-    });
-    localStorage.setItem("assignments", JSON.stringify(assignments));
-    alert("Assignments generated!");
-  };
-
-  resetBtn.onclick = () => {
-    localStorage.removeItem("assignments");
-    assignments = {};
-    alert("Assignments reset!");
-  };
-
-  spinBtn.onclick = () => {
-    const email = emailInput.value.trim();
-    if (!email) {
-      alert("Please enter an email!");
-      return;
+    function checkLogin() {
+      const input = document.getElementById("adminPassword").value;
+      if (input === ADMIN_PASSWORD) {
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("adminSection").classList.remove("hidden");
+      } else {
+        alert("Wrong incantation! The spirits reject you.");
+      }
     }
-    const result = assignments[email];
-    resultBox.style.display = 'block';
-    if (result) {
-      resultBox.innerHTML = `<strong>🎃 Result:</strong> ${result}`;
-    } else {
-      resultBox.innerHTML = `<strong>👻 Sorry!</strong> This email has no assigned result.`;
-    }
-  };
-</script>
 
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    async function generateAssignments() {
+      const emails = document.getElementById("emails").value.trim().split("\n").filter(e => e);
+      const codenames = document.getElementById("codenames").value.trim().split("\n").filter(c => c);
+
+      if (emails.length === 0 || codenames.length === 0) {
+        alert("Please enter both email and codename lists.");
+        return;
+      }
+
+      const shuffledCodenames = shuffle([...codenames]);
+      const assignments = [];
+      const resultsText = [];
+
+      for (let i = 0; i < emails.length; i++) {
+        const email = emails[i];
+        const pair = shuffledCodenames[i % shuffledCodenames.length];
+        const [codename, gender] = pair.split(" - ");
+        resultsText.push(`${email} → ${codename} (${gender})`);
+        assignments.push([new Date().toLocaleString(), email, codename, gender]);
+      }
+
+      document.getElementById("result").innerText = resultsText.join("\n");
+      document.getElementById("result").style.display = "block";
+
+      try {
+        const response = await fetch(GAS_WEBAPP_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            sheetName: "Sheet2",
+            rows: assignments
+          }),
+          headers: { "Content-Type": "application/json" }
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+          alert("Assignments saved successfully to Sheet2!");
+        } else {
+          alert("Error saving: " + result.message);
+        }
+      } catch (err) {
+        alert("Error connecting to Google Script: " + err);
+      }
+    }
+
+    // USER FETCH
+    async function fetchAssignment() {
+      const email = document.getElementById("userEmail").value.trim();
+      if (!email) {
+        alert("Please enter your email.");
+        return;
+      }
+
+      const userResult = document.getElementById("userResult");
+      userResult.innerHTML = "Summoning your fate...";
+      userResult.style.display = "block";
+
+      try {
+        const res = await fetch(`${GAS_WEBAPP_URL}?email=${encodeURIComponent(email)}&sheetName=Sheet2`);
+        const data = await res.json();
+
+        if (data.status === "found") {
+          userResult.innerHTML = `
+            <strong>Your Ghoul Codename:</strong><br>
+            ${data.codename} (${data.gender})
+          `;
+        } else {
+          userResult.innerHTML = "No record found. The spirits remain silent...";
+        }
+      } catch (err) {
+        userResult.innerHTML = "Connection error. The portal is unstable...";
+      }
+    }
+  </script>
 </body>
 </html>
