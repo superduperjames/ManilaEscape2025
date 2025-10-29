@@ -3,226 +3,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ghoul Swap Roulette</title>
+  <title>Secret Assignment Portal</title>
   <style>
-    /* --- unchanged styles --- */
+    @import url('https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap');
     body {
-      font-family: 'Raleway', sans-serif;
-      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') center/cover no-repeat;
+      font-family: 'Syne Mono', monospace;
+      background: url('https://res.cloudinary.com/dxqnb8xjb/image/upload/v1730137075/spookybg.webp');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
       color: #fff;
       text-align: center;
-      min-height: 100vh;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      backdrop-filter: brightness(0.5);
-      overflow-x: hidden;
+      padding: 50px 20px;
     }
 
     h1 {
-      font-family: 'Raleway', sans-serif;
-      font-size: 2.3rem;
-      margin-bottom: 0.2em;
-      text-shadow: 0 0 10px rgba(255,255,255,0.3);
+      font-size: 2em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 6px #000;
     }
 
     p {
-      font-size: 1rem;
-      margin-bottom: 5%;
-      color: #ddd;
-    }
-
-    input, textarea, button {
-      font-family: inherit;
-      border-radius: 8px;
-      padding: 15px;
-      border: none;
-      margin: 5px;
-      outline: none;
+      margin-bottom: 20px;
     }
 
     input, textarea {
-      width: 400px;
-      text-align: center;
+      font-family: 'Syne Mono', monospace;
+      width: 300px;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
     }
 
     button {
+      background: #222;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 8px;
+      padding: 10px 18px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      margin: 8px;
+      transition: 0.3s;
+      font-family: 'Syne Mono', monospace;
     }
 
     button:hover {
-      transform: scale(1.05);
-    }
-
-    #player-section, #admin-section {
-      background: rgba(0,0,0,0.6);
-      padding: 30px;
-      border-radius: 16px;
-      width: 60%;
-      max-width: 400%;
-      margin: 20px auto;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    #reveal-result {
-      font-size: 1.2rem;
-      margin-top: 40px;
+      background: #fff;
+      color: #000;
     }
 
     #admin-section {
       display: none;
+      margin-top: 40px;
     }
 
-    textarea {
-      resize: none;
-      height: 80px;
+    #reveal-result {
+      margin-top: 20px;
+      font-size: 1.1em;
     }
 
-    #adminBtn {
+    #modal {
       position: fixed;
-      top: 15px;
-      right: 15px;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      transition: all 0.3s ease;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
       z-index: 999;
     }
 
-    #adminBtn:hover {
-      background: rgba(255,255,255,0.35);
-      box-shadow: 0 0 10px rgba(255,255,255,0.4);
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.6s ease;
-    }
-
-    .modal.show {
+    #modal.show {
       display: flex;
-      opacity: 1;
-      pointer-events: auto;
-      animation: ghostAppear 0.8s ease;
+      animation: ghostFadeIn 0.6s ease;
     }
 
-    @keyframes ghostAppear {
-      0% { opacity: 0; transform: scale(0.95); filter: blur(4px); }
-      100% { opacity: 1; transform: scale(1); filter: blur(0); }
+    #modal-content {
+      background: #111;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 0 15px #fff2;
+    }
+
+    @keyframes ghostFadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     @keyframes ghostFadeOut {
       from { opacity: 1; transform: scale(1); }
-      to { opacity: 0; transform: scale(0.95); }
+      to { opacity: 0; transform: scale(0.9); }
     }
-
-    .modal-content {
-      background: rgba(20,20,20,0.92);
-      border-radius: 12px;
-      padding: 25px 30px;
-      max-width: 350px;
-      text-align: center;
-      color: white;
-      box-shadow: 0 0 25px rgba(255,255,255,0.3);
-      animation: ghostFloat 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes ghostFloat {
-      0% { transform: translateY(0px); }
-      100% { transform: translateY(-8px); }
-    }
-
-    .modal-content h2 {
-      margin-top: 0;
-      font-size: 1.3rem;
-      font-family: 'Syne Mono', monospace;
-      color: #f8f8f8;
-      text-shadow: 0 0 10px rgba(255,255,255,0.3);
-    }
-
-    .close-btn {
-      margin-top: 15px;
-      background: rgba(255,255,255,0.2);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .close-btn:hover { background: rgba(255,255,255,0.4); }
-
-    #closeAdmin {
-      margin-top: 15px;
-      background: transparent;
-      color: white;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      transition: all 0.3s ease;
-      text-transform: underline;
-    }
-
-    #closeAdmin:hover { background: rgba(255,255,255,0.35); }
   </style>
 </head>
 <body>
-  <button id="adminBtn" onclick="openAdminLogin()">Admin Login</button>
-
   <div id="player-section">
-    <h1>🎲 Ghoul Swap Roulette 🎲</h1>
-    <p>“Whisper your email to the void, and see who fate binds you with…”</p>
-
-    <input type="email" id="emailInput" placeholder="Enter your email..." />
-    <button onclick="checkAssignment()">Reveal My Fate</button>
-
+    <h1>🎃 Secret Assignment Portal 🎃</h1>
+    <p>Enter your email below to reveal your code name and your match's gender.</p>
+    <input type="email" id="emailInput" placeholder="Enter your email" />
+    <br>
+    <button onclick="checkAssignment()">Reveal My Assignment</button>
     <div id="reveal-result"></div>
   </div>
 
+  <button id="adminBtn" onclick="openAdminLogin()">Admin Access</button>
+
   <div id="admin-section">
-    <h1>🕯️ Ghoul Roulette Admin 🕯️</h1>
-
-    <textarea id="emailsInput" placeholder="Enter emails (one per line)..."></textarea>
-    <textarea id="codenamesInput" placeholder="Enter codenames (format: Name,Gender per line)..."></textarea>
+    <h2>Admin Panel</h2>
+    <textarea id="emailsInput" rows="5" placeholder="Enter emails (one per line)"></textarea><br>
+    <textarea id="codenamesInput" rows="5" placeholder="Enter code names and genders (e.g. Shadow, Male)"></textarea><br>
     <button onclick="generateAssignments()">Generate Assignments</button>
-    <button onclick="clearAssignments()">Reset All</button>
+    <button onclick="clearAssignments()">Clear All Entries</button>
     <button onclick="openAssignments()">Open Assignments</button>
-    <button id="closeAdmin" onclick="closeAdminPanel()">Close Admin Panel</button>
-
-    <div id="adminMessage" style="margin-top:10px;"></div>
+    <button onclick="closeAdminPanel()">Close</button>
   </div>
 
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <h2 id="modalTitle">Notice</h2>
+  <div id="modal">
+    <div id="modal-content">
+      <h3 id="modalTitle"></h3>
       <p id="modalMessage"></p>
-      <button class="close-btn" onclick="closeModal()">Close</button>
+      <button onclick="closeModal()">Close</button>
     </div>
   </div>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyymFhvJLayB5sxjSu481unIdm_yt8257Vc2lj9XcAX-luEVm88bsZzXjgEeKjZhFGK/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxp1AnTOefvqlctvkQkpluqoc1Satru5364dKfurpQplouYNtVcJ2587QodYAztubrY/exec";
 
     function showModal(title, message) {
       const modal = document.getElementById("modal");
@@ -256,7 +167,7 @@
         if (data.found) {
           resultDiv.innerHTML = `
             Your email: <strong>${email}</strong><br>
-            Your fate's code name: <strong>${data.codename}</strong><br>
+            Your fate’s code name: <strong>${data.codename}</strong><br>
             Their gender: <strong>${data.gender}</strong>
           `;
         } else {
@@ -302,14 +213,13 @@
       try {
         const res = await fetch(WEB_APP_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "generateAssignments", emails, codenames })
         });
         const data = await res.json();
         if (data.status === "success") {
-          showModal("✅ Success", `Assignments have been generated! ${data.added || 0} new entries added.`);
+          showModal("✅ Success", `Assignments have been generated! (${data.added} added)`);
         } else {
-          showModal("❌ Error", data.message || "Something went wrong while generating assignments.");
+          showModal("❌ Error", "Something went wrong while generating assignments.");
         }
       } catch (err) {
         console.error(err);
@@ -322,10 +232,9 @@
       try {
         const res = await fetch(WEB_APP_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "clearEntries" })
         });
-        const data = await res.json();
+        await res.json();
         showModal("🧹 Cleared", "All entries have been wiped clean.");
       } catch (err) {
         console.error(err);
@@ -334,7 +243,7 @@
     }
 
     function openAssignments() {
-      window.open("https://docs.google.com/spreadsheets/d/j1Q7vJWpkTwaAPeqmQfETHyYTiorAdo7XYEn_oGDC0uY/edit?gid=0", "_blank");
+      window.open("https://docs.google.com/spreadsheets/d/19BT53bGqcqZHbwop8qhEFNSDQxDzEN3OqdyUfufzNHc/edit?gid=0#gid=0", "_blank");
     }
   </script>
 </body>
