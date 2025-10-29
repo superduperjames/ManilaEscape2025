@@ -75,100 +75,121 @@
     <p id="adminStatus"></p>
   </div>
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKeOYn3S1zXpcTlUHxhkz39AgZ2zDdtSEh60WdHF1MWpB3nPVi2eThEN3iN1Ag-IGI/exec"; // 🔗 Replace this with your actual Web App URL
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFhhcFjrmDWRQ6hOItTi_-u2Wa1PXa38EAZCF2DSh0TfW_yydYVsoEb5IYpIrfdGMM/exec";
 
-    // Reveal assignment
-    async function checkAssignment() {
-      const email = document.getElementById('emailInput').value.trim();
-      const resultEl = document.getElementById('assignmentResult');
-      resultEl.textContent = "Fetching...";
+// --- PLAYER FUNCTIONALITY ---
 
-      try {
-        const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
-        const data = await res.json();
+async function checkAssignment() {
+  const email = document.getElementById("emailInput").value.trim();
+  const resultDiv = document.getElementById("reveal-result");
 
-        if (data.error) {
-          resultEl.textContent = "❌ " + data.error;
-        } else {
-          resultEl.innerHTML = `
-            🕵️‍♂️ Your Code Name: <strong>${data.assignedCodeName}</strong><br>
-            ⚧ Gender: <strong>${data.assignedGender}</strong>
-          `;
-        }
-      } catch (err) {
-        resultEl.textContent = "Error fetching assignment.";
-      }
+  if (!email) {
+    showModal("Error", "Please enter your email first, wanderer...");
+    return;
+  }
+
+  resultDiv.innerHTML = "👻 Consulting the spirits...";
+
+  try {
+    const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+    const data = await response.json();
+
+    if (data.error) {
+      resultDiv.innerHTML = "💀 " + data.error;
+    } else {
+      resultDiv.innerHTML = `
+        🕯️ <b>Code Name:</b> ${data.codeName}<br>
+        🎭 <b>Gender:</b> ${data.gender}
+      `;
     }
+  } catch (error) {
+    resultDiv.innerHTML = "☠️ Something went wrong. Try again later.";
+  }
+}
 
-    // Admin access
-    function openAdmin() {
-      const pass = document.getElementById('adminPass').value;
-      if (pass === "eventmobi2025") {
-        document.getElementById('adminPanel').style.display = "block";
-        document.getElementById('loginPanel').style.display = "none";
-        document.querySelector('.admin-login').style.display = "none";
-      } else {
-        alert("Incorrect password!");
-      }
+// --- ADMIN FUNCTIONALITY ---
+
+async function generateAssignments() {
+  const emails = document.getElementById("emailsInput").value.trim().split("\n").filter(x => x);
+  const codenames = document.getElementById("codenamesInput").value.trim().split("\n").filter(x => x);
+
+  if (emails.length === 0 || codenames.length === 0) {
+    showModal("Error", "Please fill in both the emails and codenames before generating.");
+    return;
+  }
+
+  showModal("Working...", "🔮 Randomizing the assignments... please wait...");
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "generateAssignments",
+        emails: emails,
+        codenames: codenames
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      showModal("Success", "🎲 Assignments have been randomized successfully!");
+    } else {
+      showModal("Error", "⚠️ Something went wrong: " + (data.message || "Unknown error"));
     }
+  } catch (err) {
+    showModal("Error", "💀 " + err.message);
+  }
+}
 
-    function closeAdmin() {
-      document.getElementById('adminPanel').style.display = "none";
-      document.getElementById('loginPanel').style.display = "block";
-      document.querySelector('.admin-login').style.display = "block";
+function clearAssignments() {
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "clearAssignments" }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === "cleared") {
+      showModal("Cleared", "🧹 All assignments have been wiped clean!");
+    } else {
+      showModal("Error", "Failed to clear assignments.");
     }
+  })
+  .catch(() => showModal("Error", "Network error while clearing assignments."));
+}
 
-    // Generate assignments
-    async function generateAssignments() {
-      const emails = document.getElementById('emails').value.trim().split('\n').filter(e => e);
-      const codenames = document.getElementById('codenames').value.trim().split('\n').filter(e => e);
-      const adminStatus = document.getElementById('adminStatus');
+function openAssignments() {
+  window.open("https://docs.google.com/spreadsheets/d/19BT53bGqcqZHbwop8qhEFNSDQx/edit?usp=sharing", "_blank");
+}
 
-      adminStatus.textContent = "Generating assignments...";
+// --- ADMIN PANEL CONTROL ---
 
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "generateAssignments",
-            data: { emails, codenames }
-          })
-        });
-        const data = await res.json();
-        if (data.status === "success") {
-          adminStatus.textContent = "✅ Assignments generated successfully!";
-        } else {
-          adminStatus.textContent = "❌ Failed: " + (data.error || "Unknown error");
-        }
-      } catch (err) {
-        adminStatus.textContent = "⚠️ Error generating assignments.";
-      }
-    }
+function openAdminLogin() {
+  document.getElementById("player-section").style.display = "none";
+  document.getElementById("admin-section").style.display = "block";
+}
 
-    // Clear assignments
-    async function clearAssignments() {
-      const adminStatus = document.getElementById('adminStatus');
-      if (!confirm("Are you sure you want to clear all assignments?")) return;
+function closeAdminPanel() {
+  document.getElementById("admin-section").style.display = "none";
+  document.getElementById("player-section").style.display = "block";
+}
 
-      adminStatus.textContent = "Clearing...";
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "clearAssignments" })
-        });
-        const data = await res.json();
-        if (data.status === "cleared") {
-          adminStatus.textContent = "🧹 All assignments cleared.";
-        } else {
-          adminStatus.textContent = "❌ Failed to clear assignments.";
-        }
-      } catch (err) {
-        adminStatus.textContent = "⚠️ Error clearing assignments.";
-      }
-    }
-  </script>
+// --- MODAL CONTROL ---
+
+function showModal(title, message) {
+  document.getElementById("modalTitle").innerText = title;
+  document.getElementById("modalMessage").innerText = message;
+  document.getElementById("modal").classList.add("show");
+}
+
+function closeModal() {
+  const modal = document.getElementById("modal");
+  modal.classList.remove("show");
+}
+</script>
+
 </body>
 </html>
