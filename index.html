@@ -115,6 +115,7 @@
   <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcSHlUTGvHw43MHq2DswVehVG1CjNmcZl4tQt8992xbsCioaZenHGnObHN0WGDfvFx/exec";
 
+// 🧿 Reveal assigned partner
 async function checkAssignment() {
   const email = document.getElementById("emailInput").value.trim();
   const resultDiv = document.getElementById("reveal-result");
@@ -125,8 +126,10 @@ async function checkAssignment() {
   }
 
   resultDiv.textContent = "🔮 Consulting the spirits...";
+
   try {
     const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
     const data = await res.json();
 
     if (data.error) {
@@ -135,11 +138,12 @@ async function checkAssignment() {
       resultDiv.innerHTML = `🕯️ <b>Code Name:</b> ${data.assignedCodeName}<br>🎭 <b>Gender:</b> ${data.assignedGender}`;
     }
   } catch (err) {
-    console.error("Fetch error in checkAssignment():", err);
-    resultDiv.textContent = "💀 Something went wrong. Check the console for details.";
+    console.error("Error in checkAssignment():", err);
+    resultDiv.textContent = "💀 Something went wrong while summoning your fate.";
   }
 }
 
+// 🧩 Admin: Generate Assignments
 async function generateAssignments() {
   const emails = document.getElementById("emailsInput").value.trim();
   const codenames = document.getElementById("codenamesInput").value.trim();
@@ -150,37 +154,39 @@ async function generateAssignments() {
   }
 
   try {
-    const body = new FormData();
-    body.append("emails", emails);
-    body.append("codenames", codenames);
-
+    const body = new URLSearchParams({ emails, codenames });
     const res = await fetch(SCRIPT_URL, { method: "POST", body });
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
     const data = await res.json();
 
     if (data.status === "success") {
       alert("🎲 Assignments have been randomized successfully!");
     } else {
-      throw new Error(data.error || "Something went wrong.");
+      throw new Error(data.error || "Unknown error occurred.");
     }
   } catch (err) {
-    console.error("Fetch error in generateAssignments():", err);
-    alert("💀 Error: " + err.message + "\n(Check console for full details.)");
+    console.error("Error in generateAssignments():", err);
+    alert("💀 Error: " + err.message);
   }
 }
 
+// 🧹 Reset all data
 async function clearAssignments() {
   if (!confirm("⚠️ Are you sure you want to reset all assignments?")) return;
 
   try {
     const res = await fetch(`${SCRIPT_URL}?reset=true`);
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
     const data = await res.json();
+
     alert("🧹 All assignments cleared!");
   } catch (err) {
-    console.error("Fetch error in clearAssignments():", err);
-    alert("💀 Error clearing assignments. Check console for details.");
+    console.error("Error in clearAssignments():", err);
+    alert("💀 Failed to clear assignments. Please try again.");
   }
 }
 
+// 📜 Open sheet link
 function openAssignments() {
   window.open("https://docs.google.com/spreadsheets/d/1SYO1JXSp9lU_J7XgJ4xkIgi8Uw7bXvY7H53jZ6h2ZBA/edit#gid=0", "_blank");
 }
@@ -190,16 +196,13 @@ function openAdminLogin() {
   document.getElementById("player-section").style.display = "none";
   document.getElementById("admin-section").style.display = "block";
 }
-
 function closeAdminPanel() {
   document.getElementById("admin-section").style.display = "none";
   document.getElementById("player-section").style.display = "block";
 }
-
 function closeModal() {
   document.getElementById("modal").classList.remove("show");
 }
-</script>
-
+  </script>
 </body>
 </html>
