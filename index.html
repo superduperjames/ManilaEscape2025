@@ -113,124 +113,46 @@
   </div>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyymFhvJLayB5sxjSu481unIdm_yt8257Vc2lj9XcAX-luEVm88bsZzXjgEeKjZhFGK/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyymFhvJLayB5sxjSu481unIdm_yt8257Vc2lj9XcAX-luEVm88bsZzXjgEeKjZhFGK/exec";
 
-    function showModal(title, message) {
-      const modal = document.getElementById("modal");
-      document.getElementById("modalTitle").textContent = title;
-      document.getElementById("modalMessage").textContent = message;
-      modal.classList.add("show");
-    }
-    function closeModal() {
-      const modal = document.getElementById("modal");
-      modal.classList.remove("show");
-      modal.style.animation = "ghostFadeOut 0.6s ease";
-      setTimeout(() => { modal.style.animation = ""; }, 600);
-    }
+// Fetch result by email
+async function fetchAssignment(email) {
+  try {
+    const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+    if (!response.ok) throw new Error("Network response was not ok");
+    const data = await response.json();
 
-    async function checkAssignment() {
-      const email = document.getElementById("emailInput").value.trim();
-      const resultDiv = document.getElementById("reveal-result");
-      if (!email) {
-        showModal("👻 The spirits whisper...", "They need your email to proceed.");
-        return;
-      }
-      resultDiv.textContent = "🔮 Consulting the shadows...";
-      try {
-        const res = await fetch(`${WEB_APP_URL}?action=getAssignment&email=${encodeURIComponent(email)}`);
-        const data = await res.json();
-        if (data.found) {
-          resultDiv.innerHTML = `
-            Your email: <strong>${email}</strong><br>
-            Your fate's code name: <strong>${data.codename}</strong><br>
-            Their gender: <strong>${data.gender}</strong>
-          `;
-        } else {
-          showModal("😈 No Match Found", "The spirits found no record for this email...");
-          resultDiv.textContent = "";
-        }
-      } catch (err) {
-        console.error(err);
-        showModal("💀 Network Error", "The connection was lost in the void...");
-      }
-    }
+    if (data.error) throw new Error(data.error);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
 
-    function openAdminLogin() {
-      const password = prompt("🕯️ Whisper the secret password...");
-      if (password === "escape2025") {
-        document.getElementById("player-section").style.display = "none";
-        document.getElementById("adminBtn").style.display = "none";
-        document.getElementById("admin-section").style.display = "block";
-      } else if (password !== null) {
-        showModal("👁️ Access Denied", "The shadows do not recognize you.");
-      }
-    }
+// Generate assignments
+async function generateAssignments() {
+  try {
+    const response = await fetch(SCRIPT_URL, { method: "POST" });
+    const data = await response.json();
+    if (data.status !== "Assignments updated") throw new Error("Error updating assignments");
+    alert("🎲 Assignments have been randomized successfully!");
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
 
-    function closeAdminPanel() {
-      document.getElementById("admin-section").style.display = "none";
-      document.getElementById("player-section").style.display = "block";
-      document.getElementById("adminBtn").style.display = "block";
-    }
-
-    async function generateAssignments() {
-      const emails = document.getElementById("emailsInput").value.split("\n").map(e => e.trim()).filter(Boolean);
-      const codenameLines = document.getElementById("codenamesInput").value.split("\n").map(e => e.trim()).filter(Boolean);
-      const codenames = codenameLines.map(line => {
-        const [codename, gender] = line.split(",").map(s => s.trim());
-        return { codename, gender };
-      });
-
-      if (!emails.length || !codenames.length) {
-        showModal("👻 Missing Data", "Please enter both emails and code names before generating.");
-        return;
-      }
-
-      // Randomize both arrays
-      shuffleArray(emails);
-      shuffleArray(codenames);
-
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "generateAssignments", emails, codenames })
-        });
-        const data = await res.json();
-        if (data.status === "success") {
-          showModal("✅ Success", "Assignments randomized and generated!");
-        } else {
-          showModal("❌ Error", "Something went wrong while generating assignments.");
-        }
-      } catch (err) {
-        console.error(err);
-        showModal("💀 Spell Failed", "The incantation could not reach the spreadsheet...");
-      }
-    }
-
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
-
-    async function clearAssignments() {
-      if (!confirm("Are you sure you want to clear all entries?")) return;
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "clearEntries" })
-        });
-        await res.json();
-        showModal("🧹 Cleared", "All entries have been wiped clean.");
-      } catch (err) {
-        console.error(err);
-        showModal("💀 Error", "Failed to clear entries...");
-      }
-    }
-
-    function openAssignments() {
-      window.open("https://docs.google.com/spreadsheets/d/19BT53bGqcqZHbwop8qhEFNSDQxDzEN3OqdyUfufzNHc/edit?gid=0#gid=0", "_blank");
-    }
-  </script>
+// Example: when Reveal My Fate is clicked
+document.getElementById("revealBtn").addEventListener("click", async () => {
+  const email = document.getElementById("emailInput").value.trim();
+  const status = document.getElementById("statusMessage");
+  status.textContent = "👻 Consulting the shadows...";
+  try {
+    const result = await fetchAssignment(email);
+    status.innerHTML = `🕯️ Code Name: <b>${result.codeName}</b><br>Gender: <b>${result.gender}</b>`;
+  } catch (err) {
+    status.textContent = "💀 " + err.message;
+  }
+});
+</script>
 </body>
 </html>
