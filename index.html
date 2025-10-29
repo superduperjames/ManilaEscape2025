@@ -16,6 +16,7 @@
       flex-direction: column;
       justify-content: center;
       backdrop-filter: brightness(0.5);
+      overflow-x: hidden;
     }
 
     h1 {
@@ -62,6 +63,7 @@
       max-width: 400px;
       margin: 20px auto;
       box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      transition: opacity 0.5s ease-in-out;
     }
 
     #reveal-result {
@@ -69,7 +71,7 @@
       margin-top: 15px;
     }
 
-    #admin-controls {
+    #admin-section {
       display: none;
     }
 
@@ -78,13 +80,116 @@
       height: 80px;
     }
 
-    .tiny {
-      font-size: 0.8rem;
-      opacity: 0.7;
+    #adminBtn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+
+    #adminBtn:hover {
+      background: rgba(255,255,255,0.35);
+      box-shadow: 0 0 10px rgba(255,255,255,0.4);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+      animation: ghostAppear 0.8s ease;
+    }
+
+    @keyframes ghostAppear {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes ghostFadeOut {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+    }
+
+    .modal-content {
+      background: rgba(20,20,20,0.92);
+      border-radius: 12px;
+      padding: 25px 30px;
+      max-width: 350px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 0 25px rgba(255,255,255,0.3);
+      animation: ghostFloat 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes ghostFloat {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      font-family: 'Syne Mono', monospace;
+      color: #f8f8f8;
+      text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    }
+
+    .close-btn {
+      margin-top: 15px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.4);
     }
   </style>
 </head>
 <body>
+  <button id="adminBtn" onclick="openAdminLogin()">Admin Login</button>
+
   <div id="player-section">
     <h1>🎲 Ghoul Roulette 🎲</h1>
     <p>“Whisper your email to the void, and see who fate binds you with…”</p>
@@ -93,11 +198,9 @@
     <button onclick="checkAssignment()">Reveal My Fate</button>
 
     <div id="reveal-result"></div>
-    <p class="tiny">Admins, whisper 'escape2025' in the shadows below 👇</p>
-    <input type="password" id="adminPassword" placeholder="Admin Access" onkeypress="if(event.key==='Enter') adminLogin()" />
   </div>
 
-  <div id="admin-section" style="display:none;">
+  <div id="admin-section">
     <h1>🕯️ Ghoul Roulette Admin 🕯️</h1>
 
     <textarea id="emailsInput" placeholder="Enter emails (one per line)..."></textarea>
@@ -108,19 +211,42 @@
     <div id="adminMessage" style="margin-top:10px;"></div>
 
     <div style="margin-top:20px;">
-      <button onclick="downloadCSV()">Download CSV</button>
+      <button onclick="openAssignments()">Open Assignments</button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Notice</h2>
+      <p id="modalMessage"></p>
+      <button class="close-btn" onclick="closeModal()">Close</button>
     </div>
   </div>
 
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby50XQGzPRHlXSmSe39PEKU_CKAxK-NI8TqP4EYxpBCU50oZfgBfoEWXqBgNCrOyq5p0Q/exec";
 
+    function showModal(title, message) {
+      const modal = document.getElementById("modal");
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalMessage").textContent = message;
+      modal.classList.add("show");
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("modal");
+      modal.classList.remove("show");
+      modal.style.animation = "ghostFadeOut 0.6s ease";
+      setTimeout(() => { modal.style.animation = ""; }, 600);
+    }
+
     async function checkAssignment() {
       const email = document.getElementById("emailInput").value.trim();
       const resultDiv = document.getElementById("reveal-result");
 
       if (!email) {
-        resultDiv.textContent = "👻 The spirits need an email...";
+        showModal("👻 The spirits whisper...", "They need your email to proceed.");
         return;
       }
 
@@ -137,21 +263,23 @@
             Assigned gender: <strong>${data.gender}</strong>
           `;
         } else {
-          resultDiv.textContent = "😈 The spirits found no match for this email...";
+          showModal("😈 No Match Found", "The spirits found no record for this email...");
+          resultDiv.textContent = "";
         }
       } catch (err) {
         console.error(err);
-        resultDiv.textContent = "💀 Connection lost in the void...";
+        showModal("💀 Network Error", "The connection was lost in the void...");
       }
     }
 
-    async function adminLogin() {
-      const pass = document.getElementById("adminPassword").value;
-      if (pass === "escape2025") {
+    function openAdminLogin() {
+      const password = prompt("🕯️ Whisper the secret password...");
+      if (password === "escape2025") {
         document.getElementById("player-section").style.display = "none";
+        document.getElementById("adminBtn").style.display = "none";
         document.getElementById("admin-section").style.display = "block";
-      } else {
-        alert("👁️ The spirits deny your entry...");
+      } else if (password !== null) {
+        showModal("👁️ Access Denied", "The shadows do not recognize you.");
       }
     }
 
@@ -164,26 +292,24 @@
       });
 
       if (!emails.length || !codenames.length) {
-        alert("👻 Please enter both emails and code names!");
+        showModal("👻 Missing Data", "Please enter both emails and code names before generating.");
         return;
       }
 
       try {
         const res = await fetch(WEB_APP_URL, {
           method: "POST",
-          body: JSON.stringify({
-            action: "generateAssignments",
-            emails,
-            codenames
-          })
+          body: JSON.stringify({ action: "generateAssignments", emails, codenames })
         });
-
         const data = await res.json();
-        document.getElementById("adminMessage").textContent =
-          data.status === "success" ? "✅ Assignments generated!" : "❌ Something went wrong.";
+        if (data.status === "success") {
+          showModal("✅ Success", "Assignments have been generated!");
+        } else {
+          showModal("❌ Error", "Something went wrong while generating assignments.");
+        }
       } catch (err) {
         console.error(err);
-        alert("💀 The spell failed to cast...");
+        showModal("💀 Spell Failed", "The incantation could not reach the spreadsheet...");
       }
     }
 
@@ -195,38 +321,15 @@
           body: JSON.stringify({ action: "clearEntries" })
         });
         const data = await res.json();
-        document.getElementById("adminMessage").textContent = data.message || "Cleared.";
+        showModal("🧹 Cleared", "All entries have been wiped clean.");
       } catch (err) {
         console.error(err);
-        alert("💀 Failed to reach the spellbook...");
+        showModal("💀 Error", "Failed to clear entries...");
       }
     }
 
-    async function downloadCSV() {
-      try {
-        const res = await fetch(`${WEB_APP_URL}?action=listAssignments`);
-        const data = await res.json();
-
-        if (!data.assignments?.length) {
-          alert("👻 No data to download.");
-          return;
-        }
-
-        const rows = [["Email", "Assigned Code Name", "Assigned Gender"], ...data.assignments.map(a => [a.email, a.codename, a.gender])];
-        const csv = rows.map(r => r.join(",")).join("\n");
-        const blob = new Blob([csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "ghoul_roulette_assignments.csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } catch (err) {
-        console.error(err);
-        alert("💀 Could not summon the CSV...");
-      }
+    function openAssignments() {
+      window.open("https://docs.google.com/spreadsheets/d/19BT53bGqcqZHbwop8qhEFNSDQxDzEN3OqdyUfufzNHc/edit?gid=0#gid=0", "_blank");
     }
   </script>
 </body>
