@@ -1,243 +1,179 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Ghoul Roulette — Assignments</title>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') center/cover no-repeat fixed;
-      color: #f5f5f5;
-      text-align: center;
-      margin: 0;
-      min-height: 100vh;
-      backdrop-filter: blur(5px);
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 80px auto;
-      background: rgba(0, 0, 0, 0.7);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
-    }
-
-    h1 {
-      color: #fff;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    textarea, input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      margin-bottom: 15px;
-      font-size: 14px;
-      font-family: monospace;
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-    }
-
-    textarea::placeholder, input::placeholder {
-      color: #ccc;
-    }
-
-    button {
-      background: #a855f7;
-      border: none;
-      color: #fff;
-      padding: 10px 18px;
-      font-size: 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #9333ea;
-    }
-
-    .row {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .box {
-      flex: 1 1 45%;
-      text-align: left;
-    }
-
-    .result-box {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-      font-family: monospace;
-      white-space: pre-wrap;
-    }
-
-    small {
-      color: #aaa;
-    }
-
-    .admin-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 12px;
-      color: #ccc;
-      cursor: pointer;
-    }
-
-    #loginPopup {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.8);
-      align-items: center;
-      justify-content: center;
-    }
-
-    #loginPopup div {
-      background: #111;
-      padding: 20px;
-      border-radius: 8px;
-    }
-
-    #loginPopup input {
-      width: 200px;
-      text-align: center;
-    }
+    :root{--bg:#070707;--panel:rgba(0,0,0,0.72);--accent:#8a2be2;--muted:#cfcfcf;--mono: "Courier New", monospace;}
+    body{margin:0;min-height:100vh;background:var(--bg);color:#fff;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    .wrap{max-width:980px;margin:40px auto;padding:26px;background:var(--panel);border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,0.6);}
+    h1{margin:0 0 6px;font-size:20px}
+    p.lead{color:var(--muted);margin:0 0 16px}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    @media(max-width:880px){.grid{grid-template-columns:1fr}}
+    .card{background:rgba(255,255,255,0.02);padding:14px;border-radius:8px}
+    label{display:block;font-weight:600;margin-bottom:6px}
+    input[type="email"], input[type="password"], textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;font-family:var(--mono);font-size:14px;box-sizing:border-box}
+    textarea{min-height:110px;resize:vertical}
+    .btn{display:inline-block;padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#fff}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .result{margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);font-family:var(--mono);white-space:pre-wrap;color:var(--muted)}
+    .admin-toggle{position:fixed;top:14px;right:14px;cursor:pointer;font-size:13px;opacity:0.8}
+    .hidden{display:none}
+    .tiny{font-size:13px;color:var(--muted)}
   </style>
 </head>
 <body>
-  <div class="admin-btn" onclick="showLogin()">Admin Login</div>
+  <div class="admin-toggle" id="adminToggle">🔒 Admin</div>
 
-  <div id="loginPopup">
-    <div>
-      <h3>Enter Admin Password</h3>
-      <input type="password" id="adminPassword" placeholder="••••••••">
-      <br><br>
-      <button onclick="checkAdmin()">Login</button>
+  <div class="wrap" role="main" aria-labelledby="title">
+    <h1 id="title">Ghoul Roulette — Find Your Assigned Codename</h1>
+    <p class="lead">Type your email below and reveal the codename fate assigned to you.</p>
+
+    <div class="grid">
+      <!-- User Panel -->
+      <div class="card" id="userCard" aria-labelledby="userTitle">
+        <h2 id="userTitle" style="margin:0 0 10px;font-size:16px">User Lookup</h2>
+        <label for="userEmail">Your Email</label>
+        <input id="userEmail" type="email" placeholder="you@example.com" autocomplete="email"/>
+        <div style="margin-top:10px">
+          <button class="btn" id="revealBtn">Reveal My Codename</button>
+        </div>
+        <div id="userResult" class="result hidden" role="status" aria-live="polite"></div>
+        <p class="tiny" style="margin-top:8px">If you are admin, click <strong>Admin</strong> at top-right.</p>
+      </div>
+
+      <!-- Admin Panel -->
+      <div class="card hidden" id="adminCard" aria-hidden="true">
+        <h2 style="margin:0 0 10px;font-size:16px">Admin Panel</h2>
+
+        <!-- login area -->
+        <div id="loginArea">
+          <label for="adminPassword">Enter Admin Password</label>
+          <input id="adminPassword" type="password" placeholder="password"/>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" id="loginBtn">Login</button>
+            <button class="btn ghost" id="cancelLogin">Cancel</button>
+          </div>
+          <div id="loginStatus" class="result hidden"></div>
+        </div>
+
+        <!-- admin controls (shown after login) -->
+        <div id="controlsArea" class="hidden" aria-hidden="true" style="margin-top:12px">
+          <label for="emails">Emails (one per line or comma separated)</label>
+          <textarea id="emails" placeholder="email1@example.com&#10;email2@example.com"></textarea>
+
+          <label for="codenames">Codenames and Gender (one per line OR comma separated; format: <code>Phantom - Male</code>)</label>
+          <textarea id="codenames" placeholder="Phantom - Male, Fairy - Female, Rico - Male"></textarea>
+
+          <div class="row" style="margin-top:10px">
+            <button class="btn" id="generateBtn">Generate Assignments</button>
+            <button class="btn ghost" id="resetBtn">Reset Assignments</button>
+            <button class="btn ghost" id="clearBtn">Clear Entries</button>
+          </div>
+
+          <div id="adminResult" class="result hidden" style="margin-top:10px"></div>
+          <div id="preview" class="result" style="margin-top:10px">Preview will appear here.</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="container">
-    <h1>Find Your Assigned Ghoul</h1>
-    <input type="email" id="emailInput" placeholder="you@example.com" />
-    <button onclick="revealAssignment()">Reveal My Codename</button>
-    <div id="result" class="result-box"></div>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVoeM0cXADLaYhorSgQzvCcuemAWQHSDpKU7MDjjwu48syK-ERl4tXtBtfc-m3FoIUZQ/exec";
+const ADMIN_PASSWORD = "escape2025";
 
-    <hr style="margin: 40px 0; border: 1px solid rgba(255,255,255,0.1);">
+// UI refs
+const adminToggle = document.getElementById('adminToggle');
+const adminCard = document.getElementById('adminCard');
+const loginArea = document.getElementById('loginArea');
+const controlsArea = document.getElementById('controlsArea');
+const loginBtn = document.getElementById('loginBtn');
+const cancelLogin = document.getElementById('cancelLogin');
+const adminPassword = document.getElementById('adminPassword');
+const loginStatus = document.getElementById('loginStatus');
+const emailsEl = document.getElementById('emails');
+const codenamesEl = document.getElementById('codenames');
+const generateBtn = document.getElementById('generateBtn');
+const resetBtn = document.getElementById('resetBtn');
+const clearBtn = document.getElementById('clearBtn');
+const adminResult = document.getElementById('adminResult');
+const preview = document.getElementById('preview');
+const userEmailEl = document.getElementById('userEmail');
+const revealBtn = document.getElementById('revealBtn');
+const userResult = document.getElementById('userResult');
+let assignments = {};
 
-    <h1>Generate Assignments (Admin)</h1>
-    <div class="row">
-      <div class="box">
-        <label>Emails (comma or newline separated)</label>
-        <textarea id="emails" rows="5" placeholder="james@email.com, hello@email.com"></textarea>
-      </div>
-      <div class="box">
-        <label>Codenames & Gender (comma separated; e.g., Phantom - Male, Fairy - Female)</label>
-        <textarea id="codenames" rows="5" placeholder="Phantom - Male, Fairy - Female, Rico - Male"></textarea>
-      </div>
-    </div>
-    <button onclick="generateAssignments()">Generate Assignments</button>
-    <button onclick="downloadCSV()">Download CSV (local)</button>
-    <button onclick="resetLocal()">Reset Local</button>
+function splitEmails(raw){return raw.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);}
+function splitCodenames(raw){const items=raw.includes(',')&&!raw.includes('\n')?raw.split(','):raw.split(/\n/);return items.map(s=>s.trim()).filter(Boolean);}
+function parsePair(line){const parts=line.split(/\s*[-,|]\s*/);return{codename:(parts[0]||'').trim(),gender:(parts[1]||'').trim()||''};}
+function shuffle(a){const arr=a.slice();for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function show(el){el.classList.remove('hidden');}
+function hide(el){el.classList.add('hidden');}
 
-    <div id="output" class="result-box"></div>
-  </div>
+adminToggle.onclick=()=>adminCard.classList.toggle('hidden');
+cancelLogin.onclick=()=>hide(adminCard);
 
-  <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwBuOj0frBX9IX6y9xvPPvVM5DFCdbMuYaugo-0T6OXxUtClLHhdzk2PZ90f31w50ab/exec';
+loginBtn.onclick=()=>{
+  if(adminPassword.value.trim()===ADMIN_PASSWORD){hide(loginArea);show(controlsArea);adminPassword.value='';emailsEl.value=localStorage.getItem('admin_emails')||"";codenamesEl.value=localStorage.getItem('admin_codenames')||"";renderPreview();loadLocalAssignments();}
+  else{loginStatus.textContent="Wrong password.";show(loginStatus);}
+};
 
-    // === Admin Login ===
-    function showLogin() {
-      document.getElementById('loginPopup').style.display = 'flex';
-    }
+emailsEl.oninput=()=>{localStorage.setItem('admin_emails',emailsEl.value);renderPreview();}
+codenamesEl.oninput=()=>{localStorage.setItem('admin_codenames',codenamesEl.value);renderPreview();}
 
-    function checkAdmin() {
-      const pass = document.getElementById('adminPassword').value;
-      if (pass === 'escape2025') {
-        document.getElementById('loginPopup').style.display = 'none';
-        alert('Admin unlocked.');
-      } else {
-        alert('Incorrect password.');
-      }
-    }
+function renderPreview(){
+  const ems=splitEmails(emailsEl.value);
+  const codes=splitCodenames(codenamesEl.value).map(parsePair);
+  if(!ems.length||!codes.length){preview.textContent="Enter both Emails and Codenames to see a preview.";return;}
+  const pool=shuffle(codes.slice());let idx=0;const lines=[];
+  for(let i=0;i<ems.length;i++){if(idx>=pool.length){pool.push(...shuffle(codes.slice()));}const p=pool[idx++];lines.push(`${ems[i]} → ${p.codename} (${p.gender})`);}
+  preview.textContent=lines.join("\n");
+}
 
-    // === Generate Assignments ===
-    async function generateAssignments() {
-      const emails = document.getElementById('emails').value.trim();
-      const codenameStr = document.getElementById('codenames').value.trim();
+generateBtn.onclick=async()=>{
+  const emailList=splitEmails(emailsEl.value.trim());
+  const cnameList=splitCodenames(codenamesEl.value.trim()).map(parsePair);
+  if(!emailList.length||!cnameList.length){alert("Please provide both Emails and Codenames.");return;}
+  generateBtn.disabled=true;generateBtn.textContent="Generating...";
+  try{
+    const resp=await fetch(SCRIPT_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generateAssignments',emails:emailList,codenames:cnameList})});
+    const json=await resp.json();
+    if(resp.ok&&json.status==='success'){adminResult.textContent=`Saved ${json.added.length} new assignment(s).\n\n`+json.added.map(a=>`${a.email} → ${a.codename} (${a.gender})`).join('\n');show(adminResult);loadLocalAssignments();}
+    else{adminResult.textContent=`Error: ${json.error||'Unknown error'}`;show(adminResult);}
+  }catch(e){alert('Network error.');}finally{generateBtn.disabled=false;generateBtn.textContent="Generate Assignments";}
+};
 
-      if (!emails || !codenameStr) return alert('Please fill both fields.');
+resetBtn.onclick=async()=>{
+  if(!confirm('This will remove all assignments. Continue?'))return;
+  resetBtn.disabled=true;resetBtn.textContent="Resetting...";
+  try{const resp=await fetch(SCRIPT_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resetAssignments'})});
+  const json=await resp.json();if(json.status==='success'){adminResult.textContent='All assignments reset.';show(adminResult);assignments={};localStorage.removeItem('assignments_cache');}
+  else{adminResult.textContent=`Error: ${json.error||'Unknown'}`;show(adminResult);}}catch(e){alert('Network error.');}
+  resetBtn.disabled=false;resetBtn.textContent="Reset Assignments";
+};
 
-      // Split codenames by comma
-      const codenameLines = codenameStr.split(',').map(s => s.trim()).filter(Boolean).join('\n');
+clearBtn.onclick=()=>{if(confirm('Clear inputs?')){emailsEl.value='';codenamesEl.value='';localStorage.removeItem('admin_emails');localStorage.removeItem('admin_codenames');preview.textContent='Inputs cleared.';}};
 
-      document.getElementById('output').innerText = 'Generating...';
+revealBtn.onclick=async()=>{
+  const email=userEmailEl.value.trim();if(!email){alert('Please enter your email.');return;}
+  userResult.textContent='Summoning your codename...';userResult.classList.remove('hidden');
+  try{const url=new URL(SCRIPT_URL);url.searchParams.set('action','getAssignment');url.searchParams.set('email',email);
+  const resp=await fetch(url.toString(),{method:'GET',mode:'cors'});const json=await resp.json();
+  if(json.found){userResult.textContent=`${json.codename} (${json.gender})`;}else{userResult.textContent='No spirit has claimed your name yet...';}}
+  catch(e){userResult.textContent='Error connecting to the underworld...';}
+};
 
-      try {
-        const res = await fetch(`${scriptURL}?action=generateAssignments&emails=${encodeURIComponent(emails)}&codenames=${encodeURIComponent(codenameLines)}`);
-        const data = await res.json();
+async function loadLocalAssignments(){
+  try{const url=new URL(SCRIPT_URL);url.searchParams.set('action','listAssignments');
+  const resp=await fetch(url.toString(),{method:'GET',mode:'cors'});const json=await resp.json();
+  if(json.status==='success'){assignments={};json.assignments.forEach(r=>assignments[r.email]={codename:r.codename,gender:r.gender});
+  localStorage.setItem('assignments_cache',JSON.stringify(assignments));}}catch(e){assignments=JSON.parse(localStorage.getItem('assignments_cache')||'{}');}
+}
 
-        if (data.status === 'success') {
-          const output = data.assignments.map(a => `${a.email} → ${a.codename} (${a.gender})`).join('\n');
-          document.getElementById('output').innerText = `Saved ${data.assignments.length} rows.\n\n${output}`;
-          localStorage.setItem('assignments', JSON.stringify(data.assignments));
-        } else {
-          document.getElementById('output').innerText = `Error: ${data.error || 'Unknown error'}`;
-        }
-      } catch (err) {
-        alert('Error connecting to Google Script.\n' + err);
-      }
-    }
-
-    // === Reveal Codename ===
-    async function revealAssignment() {
-      const email = document.getElementById('emailInput').value.trim();
-      if (!email) return alert('Enter your email first.');
-
-      try {
-        const res = await fetch(`${scriptURL}?action=getAssignment&email=${encodeURIComponent(email)}`);
-        const data = await res.json();
-
-        if (data.found) {
-          document.getElementById('result').innerText = `💀 ${data.codename} (${data.gender})`;
-        } else {
-          document.getElementById('result').innerText = data.message;
-        }
-      } catch (err) {
-        alert('Error connecting to Google Script.\n' + err);
-      }
-    }
-
-    // === CSV Download ===
-    function downloadCSV() {
-      const data = JSON.parse(localStorage.getItem('assignments') || '[]');
-      if (data.length === 0) return alert('No local data to download.');
-
-      let csv = 'Email,Assigned Code Name,Assigned Gender\n';
-      data.forEach(r => csv += `${r.email},${r.codename},${r.gender}\n`);
-
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'ghoul_assignments.csv';
-      a.click();
-    }
-
-    function resetLocal() {
-      localStorage.removeItem('assignments');
-      document.getElementById('output').innerText = '';
-      alert('Local data cleared.');
-    }
-  </script>
+(function init(){emailsEl.value=localStorage.getItem('admin_emails')||'';codenamesEl.value=localStorage.getItem('admin_codenames')||'';renderPreview();loadLocalAssignments();})();
+</script>
 </body>
 </html>
