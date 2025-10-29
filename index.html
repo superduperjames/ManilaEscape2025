@@ -6,7 +6,7 @@
   <title>Ghoul Swap Roulette</title>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Raleway', sans-serif;
       background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') center/cover no-repeat;
       color: #fff;
       text-align: center;
@@ -59,8 +59,8 @@
       background: rgba(0,0,0,0.6);
       padding: 30px;
       border-radius: 16px;
-      width: 90%;
-      max-width: 400px;
+      width: 60%;
+      max-width: 400%;
       margin: 20px auto;
       box-shadow: 0 0 20px rgba(255,255,255,0.2);
       transition: opacity 0.5s ease-in-out;
@@ -68,7 +68,7 @@
 
     #reveal-result {
       font-size: 1.2rem;
-      margin-top: 15px;
+      margin-top: 40px;
     }
 
     #admin-section {
@@ -208,7 +208,7 @@
   <button id="adminBtn" onclick="openAdminLogin()">Admin Login</button>
 
   <div id="player-section">
-    <h1>🎲 Ghoul Roulette 🎲</h1>
+    <h1>🎲 Ghoul Swap Roulette 🎲</h1>
     <p>“Whisper your email to the void, and see who fate binds you with…”</p>
 
     <input type="email" id="emailInput" placeholder="Enter your email..." />
@@ -273,9 +273,9 @@
 
         if (data.found) {
           resultDiv.innerHTML = `
-            ✉️ <strong>${email}</strong><br>
-            Your code name: <strong>${data.codename}</strong><br>
-            Assigned gender: <strong>${data.gender}</strong>
+            Your email:<strong>${email}</strong><br>
+            Your fate's code name: <strong>${data.codename}</strong><br>
+            Their gender: <strong>${data.gender}</strong>
           `;
         } else {
           showModal("😈 No Match Found", "The spirits found no record for this email...");
