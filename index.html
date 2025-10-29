@@ -129,9 +129,10 @@ async function checkAssignment() {
     if (data.error) resultDiv.textContent = "💀 " + data.error;
     else
       resultDiv.innerHTML = `🕯️ <b>Code Name:</b> ${data.assignedCodeName}<br>🎭 <b>Gender:</b> ${data.assignedGender}`;
-  } catch (err) {
-    resultDiv.textContent = "💀 Something went wrong.";
-  }
+catch (err) {
+  console.error("Fetch error in checkAssignment():", err);
+  resultDiv.textContent = "💀 Something went wrong. Check the console for details.";
+}
 }
 
 async function generateAssignments() {
@@ -150,9 +151,11 @@ async function generateAssignments() {
 
     if (data.status === "success") alert("🎲 Assignments have been randomized successfully!");
     else throw new Error(data.error || "Something went wrong.");
-  } catch (err) {
-    alert("💀 Error: " + err.message);
-  }
+catch (err) {
+  console.error("Fetch error in generateAssignments():", err);
+  alert("💀 Error: " + err.message + "\n(Check console for full details.)");
+}
+
 }
 
 async function clearAssignments() {
@@ -161,9 +164,11 @@ async function clearAssignments() {
     const res = await fetch(`${SCRIPT_URL}?reset=true`);
     const data = await res.json();
     alert("🧹 All assignments cleared!");
-  } catch (err) {
-    alert("Error clearing assignments.");
-  }
+catch (err) {
+  console.error("Fetch error in clearAssignments():", err);
+  alert("💀 Error clearing assignments. Check console for details.");
+}
+
 }
 
 function openAssignments() {
