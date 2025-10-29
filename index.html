@@ -58,7 +58,6 @@
     }
     .modal.show { display: flex; opacity: 1; pointer-events: auto; animation: ghostAppear 0.8s ease; }
     @keyframes ghostAppear { 0% { opacity: 0; transform: scale(0.95); filter: blur(4px); } 100% { opacity: 1; transform: scale(1); filter: blur(0); } }
-    @keyframes ghostFadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
     .modal-content {
       background: rgba(20,20,20,0.92);
       border-radius: 12px; padding: 25px 30px;
@@ -86,7 +85,7 @@
     <p>“Whisper your email to the void, and see who fate binds you with…”</p>
 
     <input type="email" id="emailInput" placeholder="Enter your email..." />
-    <button id="revealBtn">Reveal My Fate</button>
+    <button onclick="checkAssignment()">Reveal My Fate</button>
 
     <div id="reveal-result"></div>
   </div>
@@ -115,40 +114,17 @@
   <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyymFhvJLayB5sxjSu481unIdm_yt8257Vc2lj9XcAX-luEVm88bsZzXjgEeKjZhFGK/exec";
 
-// --- Modal Helpers ---
-function showModal(title, message) {
-  document.getElementById("modalTitle").textContent = title;
-  document.getElementById("modalMessage").textContent = message;
-  document.getElementById("modal").classList.add("show");
-}
-function closeModal() {
-  document.getElementById("modal").classList.remove("show");
-}
-
-// --- Admin Login ---
-function openAdminLogin() {
-  document.getElementById("player-section").style.display = "none";
-  document.getElementById("admin-section").style.display = "block";
-}
-function closeAdminPanel() {
-  document.getElementById("admin-section").style.display = "none";
-  document.getElementById("player-section").style.display = "block";
-}
-function openAssignments() {
-  window.open("https://docs.google.com/spreadsheets/d/1j2Q7vJWpkTWaAPeqmQfETHhYyTiorAdo7XYEn_oGDC0u/edit?gid=0#gid=0", "_blank");
-}
-
-// --- Reveal My Fate ---
-document.getElementById("revealBtn").addEventListener("click", async () => {
+// PLAYER SECTION
+async function checkAssignment() {
   const email = document.getElementById("emailInput").value.trim();
   const resultDiv = document.getElementById("reveal-result");
 
   if (!email) {
-    showModal("🩸 Error", "Please enter your email first, mortal.");
+    showModal("Uh-oh...", "Please enter your email first!");
     return;
   }
 
-  resultDiv.textContent = "🕯️ Consulting the shadows...";
+  resultDiv.innerHTML = "👻 Consulting the shadows...";
 
   try {
     const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
@@ -156,54 +132,76 @@ document.getElementById("revealBtn").addEventListener("click", async () => {
 
     if (data.error) throw new Error(data.error);
 
-    resultDiv.innerHTML = `🕯️ Your Assigned Code Name: <b>${data.codeName}</b><br>💀 Gender: <b>${data.gender}</b>`;
+    resultDiv.innerHTML = `🕯️ Your Assigned Code Name: <b>${data.assignedCodeName}</b><br>👤 Gender: <b>${data.assignedGender}</b>`;
   } catch (err) {
-    showModal("💀 Network Error", "The connection was lost in the void...");
+    resultDiv.innerHTML = "💀 " + err.message;
   }
-});
+}
 
-// --- Admin: Generate Assignments ---
+// ADMIN SECTION
+function openAdminLogin() {
+  document.getElementById("player-section").style.display = "none";
+  document.getElementById("admin-section").style.display = "block";
+}
+
+function closeAdminPanel() {
+  document.getElementById("admin-section").style.display = "none";
+  document.getElementById("player-section").style.display = "block";
+}
+
 async function generateAssignments() {
-  const emails = document.getElementById("emailsInput").value.trim().split("\n").filter(Boolean);
-  const codenames = document.getElementById("codenamesInput").value.trim().split("\n").filter(Boolean);
+  const emails = document.getElementById("emailsInput").value.trim();
+  const codenames = document.getElementById("codenamesInput").value.trim();
 
-  if (emails.length === 0 || codenames.length === 0) {
-    showModal("🩸 Warning", "Please fill both emails and codenames.");
+  if (!emails || !codenames) {
+    showModal("Incomplete Data", "Please fill both email and codename lists.");
     return;
   }
 
-  const pairs = codenames.map(line => {
-    const [name, gender] = line.split(",").map(s => s.trim());
-    return { name, gender };
-  });
+  const payload = {
+    emails: emails.split("\n").map(e => e.trim()).filter(e => e),
+    codenames: codenames.split("\n").map(e => e.trim()).filter(e => e)
+  };
 
   try {
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
-      body: JSON.stringify({ emails, pairs }),
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "generateAssignments", data: payload })
     });
-
     const data = await res.json();
-    if (data.status === "Assignments updated") {
-      showModal("🎲 Success", "Assignments have been randomized successfully!");
-    } else {
-      throw new Error("Failed to update assignments");
-    }
+
+    if (data.status === "success") {
+      showModal("🎲 Success!", "Assignments randomized and saved!");
+    } else throw new Error(data.message || "Error generating assignments.");
   } catch (err) {
-    showModal("💀 Error", "Something went wrong while updating.");
+    showModal("Error", err.message);
   }
 }
 
-// --- Admin: Reset ---
 async function clearAssignments() {
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=clear`);
-    const data = await res.json();
-    if (data.status === "cleared") showModal("🧹 Cleared", "All assignments have been reset.");
-  } catch (err) {
-    showModal("💀 Error", "Failed to clear assignments.");
-  }
+  if (!confirm("Are you sure you want to reset everything?")) return;
+
+  await fetch(SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "clearAssignments" })
+  });
+  showModal("🧹 Cleared", "All assignments have been reset!");
+}
+
+function openAssignments() {
+  window.open("https://docs.google.com/spreadsheets/d/19BT53bGqcqZHbwop8qhEFNSDQx", "_blank");
+}
+
+// MODAL
+function showModal(title, message) {
+  document.getElementById("modalTitle").innerText = title;
+  document.getElementById("modalMessage").innerText = message;
+  document.getElementById("modal").classList.add("show");
+}
+function closeModal() {
+  document.getElementById("modal").classList.remove("show");
 }
   </script>
 </body>
