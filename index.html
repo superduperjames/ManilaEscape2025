@@ -124,27 +124,13 @@
     }
 
     @keyframes ghostAppear {
-      0% {
-        opacity: 0;
-        transform: scale(0.95);
-        filter: blur(4px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-        filter: blur(0);
-      }
+      0% { opacity: 0; transform: scale(0.95); filter: blur(4px); }
+      100% { opacity: 1; transform: scale(1); filter: blur(0); }
     }
 
     @keyframes ghostFadeOut {
-      from {
-        opacity: 1;
-        transform: scale(1);
-      }
-      to {
-        opacity: 0;
-        transform: scale(0.95);
-      }
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.95); }
     }
 
     .modal-content {
@@ -272,7 +258,7 @@
 
         if (data.found) {
           resultDiv.innerHTML = `
-            Your email:<strong>${email}</strong><br>
+            Your email: <strong>${email}</strong><br>
             Your fate's code name: <strong>${data.codename}</strong><br>
             Their gender: <strong>${data.gender}</strong>
           `;
@@ -316,14 +302,32 @@
         return;
       }
 
+      // 🔮 Ensure one-to-one unique mapping
+      const assignments = {};
+      const availableCodenames = [...codenames];
+      
+      for (const email of emails) {
+        if (assignments[email]) continue; // Skip already assigned
+        if (availableCodenames.length > 0) {
+          const index = Math.floor(Math.random() * availableCodenames.length);
+          const { codename, gender } = availableCodenames.splice(index, 1)[0];
+          assignments[email] = { codename, gender };
+        } else {
+          console.warn(`⚠️ No more codenames left for ${email}`);
+        }
+      }
+
       try {
         const res = await fetch(WEB_APP_URL, {
           method: "POST",
-          body: JSON.stringify({ action: "generateAssignments", emails, codenames })
+          body: JSON.stringify({
+            action: "generateAssignments",
+            assignments
+          })
         });
         const data = await res.json();
         if (data.status === "success") {
-          showModal("✅ Success", "Assignments have been generated!");
+          showModal("✅ Success", "Assignments have been generated — one soul per name!");
         } else {
           showModal("❌ Error", "Something went wrong while generating assignments.");
         }
