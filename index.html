@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ghoul Swap Roulette</title>
   <style>
+    /* (kept your original styling with minor spacing tweaks) */
     body {
       font-family: 'Raleway', sans-serif;
       background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') center/cover no-repeat;
@@ -19,174 +20,50 @@
       overflow-x: hidden;
     }
 
-    h1 {
-      font-family: 'Raleway', sans-serif;
-      font-size: 2.3rem;
-      margin-bottom: 0.2em;
-      text-shadow: 0 0 10px rgba(255,255,255,0.3);
-    }
+    h1 { font-size: 2.3rem; margin-bottom: 0.2em; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+    p  { font-size: 1rem; margin-bottom: 5%; color: #ddd; }
 
-    p {
-      font-size: 1rem;
-      margin-bottom: 5%;
-      color: #ddd;
-    }
-
-    input, textarea, button {
-      font-family: inherit;
-      border-radius: 8px;
-      padding: 15px;
-      border: none;
-      margin: 5px;
-      outline: none;
-    }
-
-    input, textarea {
-      width: 400px;
-      text-align: center;
-    }
-
-    button {
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-    }
+    input, textarea, button { font-family: inherit; border-radius: 8px; padding: 12px 14px; border: none; margin: 6px; outline: none; }
+    input, textarea { width: 400px; text-align: center; }
+    button { cursor: pointer; transition: all 0.25s ease; }
+    button:hover { transform: scale(1.03); }
 
     #player-section, #admin-section {
       background: rgba(0,0,0,0.6);
-      padding: 30px;
-      border-radius: 16px;
+      padding: 26px;
+      border-radius: 14px;
       width: 60%;
-      max-width: 400%;
+      max-width: 960px;
       margin: 20px auto;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
-      transition: opacity 0.5s ease-in-out;
+      box-shadow: 0 0 20px rgba(255,255,255,0.15);
+      transition: opacity 0.4s ease-in-out;
     }
 
-    #reveal-result {
-      font-size: 1.2rem;
-      margin-top: 40px;
-    }
+    #reveal-result { font-size: 1.1rem; margin-top: 28px; color: #fff; }
 
-    #admin-section {
-      display: none;
-    }
+    #admin-section { display: none; }
 
-    textarea {
-      resize: none;
-      height: 80px;
-    }
+    textarea { resize: none; height: 120px; }
 
     #adminBtn {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.4);
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      transition: all 0.3s ease;
-      z-index: 999;
+      position: fixed; top: 15px; right: 15px;
+      background: rgba(255,255,255,0.12); color: white;
+      border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
+      padding: 8px 14px; font-size: 0.95rem; cursor: pointer;
+      backdrop-filter: blur(6px); z-index: 999;
     }
 
-    #adminBtn:hover {
-      background: rgba(255,255,255,0.35);
-      box-shadow: 0 0 10px rgba(255,255,255,0.4);
+    /* Modal styles */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); justify-content: center; align-items: center; z-index: 2000; }
+    .modal.show { display: flex; }
+    .modal-box {
+      background: rgba(18,18,18,0.96); color: #fff; padding: 22px 26px; border-radius: 12px;
+      max-width: 520px; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.6);
     }
+    .close-btn { margin-top: 14px; background: rgba(255,255,255,0.12); color: white; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; }
+    .close-btn:hover { background: rgba(255,255,255,0.22); }
 
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.6s ease;
-    }
-
-    .modal.show {
-      display: flex;
-      opacity: 1;
-      pointer-events: auto;
-      animation: ghostAppear 0.8s ease;
-    }
-
-    @keyframes ghostAppear {
-      0% { opacity: 0; transform: scale(0.95); filter: blur(4px); }
-      100% { opacity: 1; transform: scale(1); filter: blur(0); }
-    }
-
-    @keyframes ghostFadeOut {
-      from { opacity: 1; transform: scale(1); }
-      to { opacity: 0; transform: scale(0.95); }
-    }
-
-    .modal-content {
-      background: rgba(20,20,20,0.92);
-      border-radius: 12px;
-      padding: 25px 30px;
-      max-width: 350px;
-      text-align: center;
-      color: white;
-      box-shadow: 0 0 25px rgba(255,255,255,0.3);
-      animation: ghostFloat 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes ghostFloat {
-      0% { transform: translateY(0px); }
-      100% { transform: translateY(-8px); }
-    }
-
-    .modal-content h2 {
-      margin-top: 0;
-      font-size: 1.3rem;
-      font-family: 'Syne Mono', monospace;
-      color: #f8f8f8;
-      text-shadow: 0 0 10px rgba(255,255,255,0.3);
-    }
-
-    .close-btn {
-      margin-top: 15px;
-      background: rgba(255,255,255,0.2);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .close-btn:hover {
-      background: rgba(255,255,255,0.4);
-    }
-
-    #closeAdmin {
-      margin-top: 15px;
-      background:transparent;
-      color: white;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      transition: all 0.3s ease;
-      text-transform:underline;
-    }
-
-    #closeAdmin:hover {
-      background: rgba(255,255,255,0.35);
-    }
+    .btn-row { display:flex; gap:10px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
   </style>
 </head>
 <body>
@@ -205,62 +82,65 @@
   <div id="admin-section">
     <h1>🕯️ Ghoul Roulette Admin 🕯️</h1>
 
-    <textarea id="emailsInput" placeholder="Enter emails (one per line)..."></textarea>
-    <textarea id="codenamesInput" placeholder="Enter codenames (format: Name,Gender per line)..."></textarea>
-    <button onclick="generateAssignments()">Generate Assignments</button>
-    <button onclick="clearAssignments()">Reset All</button>
-    <button onclick="openAssignments()">Open Assignments</button>
-    <button id="closeAdmin" onclick="closeAdminPanel()">Close Admin Panel</button>
+    <label style="display:block; margin-bottom:6px; color:#ccc;">Emails (one per line)</label>
+    <textarea id="emailsInput" placeholder="alice@example.com&#10;bob@example.com"></textarea>
 
-    <div id="adminMessage" style="margin-top:10px;"></div>
+    <label style="display:block; margin-top:12px; margin-bottom:6px; color:#ccc;">Codenames (format: Name,Gender per line — one per email in order)</label>
+    <textarea id="codenamesInput" placeholder="MysteryMaven,Female&#10;NightRogue,Male"></textarea>
+
+    <div class="btn-row">
+      <button onclick="generateAssignments()">Generate Assignments</button>
+      <button onclick="clearAssignments()">Reset All</button>
+      <button onclick="openAssignments()">Open Assignments</button>
+      <button id="closeAdmin" onclick="closeAdminPanel()">Close Admin Panel</button>
+    </div>
+
+    <div id="adminMessage" style="margin-top:12px; color:#fffb;"></div>
   </div>
 
   <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-box">
       <h2 id="modalTitle">Notice</h2>
-      <p id="modalMessage"></p>
-      <button class="close-btn" onclick="closeModal()">Close</button>
+      <p id="modalMessage" style="white-space:pre-line"></p>
+      <div class="btn-row">
+        <button class="close-btn" onclick="closeModal()">Close</button>
+      </div>
     </div>
   </div>
 
   <script>
+    // Use the Web App URL you provided
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby50XQGzPRHlXSmSe39PEKU_CKAxK-NI8TqP4EYxpBCU50oZfgBfoEWXqBgNCrOyq5p0Q/exec";
 
     function showModal(title, message) {
-      const modal = document.getElementById("modal");
       document.getElementById("modalTitle").textContent = title;
       document.getElementById("modalMessage").textContent = message;
-      modal.classList.add("show");
+      document.getElementById("modal").classList.add("show");
     }
-
     function closeModal() {
-      const modal = document.getElementById("modal");
-      modal.classList.remove("show");
-      modal.style.animation = "ghostFadeOut 0.6s ease";
-      setTimeout(() => { modal.style.animation = ""; }, 600);
+      const m = document.getElementById("modal");
+      m.classList.remove("show");
     }
 
+    // Player: check assignment by email (GET)
     async function checkAssignment() {
       const email = document.getElementById("emailInput").value.trim();
       const resultDiv = document.getElementById("reveal-result");
-
       if (!email) {
         showModal("👻 The spirits whisper...", "They need your email to proceed.");
         return;
       }
-
       resultDiv.textContent = "🔮 Consulting the shadows...";
-
       try {
         const res = await fetch(`${WEB_APP_URL}?action=getAssignment&email=${encodeURIComponent(email)}`);
+        if (!res.ok) throw new Error("Network error");
         const data = await res.json();
-
         if (data.found) {
           resultDiv.innerHTML = `
-            Your email: <strong>${email}</strong><br>
-            Your fate's code name: <strong>${data.codename}</strong><br>
-            Their gender: <strong>${data.gender}</strong>
+            Your email: <strong>${escapeHtml(email)}</strong><br>
+            Your fate's code name: <strong>${escapeHtml(data.codename)}</strong><br>
+            Their gender: <strong>${escapeHtml(data.gender)}</strong>
           `;
         } else {
           showModal("😈 No Match Found", "The spirits found no record for this email...");
@@ -269,9 +149,11 @@
       } catch (err) {
         console.error(err);
         showModal("💀 Network Error", "The connection was lost in the void...");
+        resultDiv.textContent = "";
       }
     }
 
+    // Admin login
     function openAdminLogin() {
       const password = prompt("🕯️ Whisper the secret password...");
       if (password === "escape2025") {
@@ -282,76 +164,117 @@
         showModal("👁️ Access Denied", "The shadows do not recognize you.");
       }
     }
-
     function closeAdminPanel() {
       document.getElementById("admin-section").style.display = "none";
       document.getElementById("player-section").style.display = "block";
       document.getElementById("adminBtn").style.display = "block";
     }
 
-    async function generateAssignments() {
-      const emails = document.getElementById("emailsInput").value.split("\n").map(e => e.trim()).filter(Boolean);
-      const codenameLines = document.getElementById("codenamesInput").value.split("\n").map(e => e.trim()).filter(Boolean);
-      const codenames = codenameLines.map(line => {
-        const [codename, gender] = line.split(",").map(s => s.trim());
-        return { codename, gender };
-      });
+    // Helper: escape text for safe innerHTML fragments
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/[&<>"']/g, (s) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
+    }
 
-      if (!emails.length || !codenames.length) {
+    // Generate assignments: send emails[] and codenames[] to Apps Script
+    async function generateAssignments() {
+      const emails = document.getElementById("emailsInput").value
+        .split("\n").map(s => s.trim()).filter(Boolean);
+      const codenameLines = document.getElementById("codenamesInput").value
+        .split("\n").map(s => s.trim()).filter(Boolean);
+
+      if (!emails.length || !codenameLines.length) {
         showModal("👻 Missing Data", "Please enter both emails and code names before generating.");
         return;
       }
 
-      // 🔮 Ensure one-to-one unique mapping
-      const assignments = {};
-      const availableCodenames = [...codenames];
-      
-      for (const email of emails) {
-        if (assignments[email]) continue; // Skip already assigned
-        if (availableCodenames.length > 0) {
-          const index = Math.floor(Math.random() * availableCodenames.length);
-          const { codename, gender } = availableCodenames.splice(index, 1)[0];
-          assignments[email] = { codename, gender };
-        } else {
-          console.warn(`⚠️ No more codenames left for ${email}`);
+      // Parse codenames input into objects { codename, gender }
+      const codenames = codenameLines.map(line => {
+        const parts = line.split(",").map(p => p.trim());
+        return { codename: parts[0] || "", gender: parts[1] || "" };
+      });
+
+      // Pairing policy: pair by index. Only pairs up to the min length will be considered.
+      const pairCount = Math.min(emails.length, codenames.length);
+      if (pairCount === 0) {
+        showModal("⚠️ Nothing to assign", "Make sure each line in the codenames input follows: Name,Gender");
+        return;
+      }
+      if (emails.length !== codenames.length) {
+        // warn admin but continue with min length pairs
+        if (!confirm(`You have ${emails.length} emails and ${codenames.length} codename lines.\nOnly the first ${pairCount} pairs will be used. Continue?`)) {
+          return;
         }
       }
+
+      // Build final arrays to send (only up to pairCount)
+      const sendEmails = emails.slice(0, pairCount);
+      const sendCodenames = codenames.slice(0, pairCount);
+
+      // Show a quick "working" modal
+      showModal("🔮 Generating...", `Preparing ${sendEmails.length} assignment(s) — contacting the spirits...`);
 
       try {
         const res = await fetch(WEB_APP_URL, {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "generateAssignments",
-            assignments
+            emails: sendEmails,
+            codenames: sendCodenames
           })
         });
+
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status}`);
+        }
+
         const data = await res.json();
+
         if (data.status === "success") {
-          showModal("✅ Success", "Assignments have been generated — one soul per name!");
+          const added = Number(data.added || 0);
+          if (added === sendEmails.length) {
+            showModal("✅ Success", `All ${added} assignment(s) were added.`);
+          } else if (added > 0) {
+            showModal("⚠️ Partial Success", `${added} added, ${sendEmails.length - added} skipped (they may already exist).`);
+          } else {
+            showModal("⚠️ No New Assignments", `No new rows were added. All ${sendEmails.length} email/codename pairs already exist or were invalid.`);
+          }
         } else {
-          showModal("❌ Error", "Something went wrong while generating assignments.");
+          // Show backend message if present
+          const message = data.message || data.error || "Something went wrong while generating assignments.";
+          showModal("❌ Error", message);
         }
       } catch (err) {
-        console.error(err);
+        console.error("generateAssignments error:", err);
         showModal("💀 Spell Failed", "The incantation could not reach the spreadsheet...");
       }
     }
 
+    // Clear entries
     async function clearAssignments() {
-      if (!confirm("Are you sure you want to clear all entries?")) return;
+      if (!confirm("Are you sure you want to clear all entries? This cannot be undone.")) return;
+      showModal("🧹 Clearing...", "Wiping the slate...");
       try {
         const res = await fetch(WEB_APP_URL, {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "clearEntries" })
         });
+        if (!res.ok) throw new Error("Network error");
         const data = await res.json();
-        showModal("🧹 Cleared", "All entries have been wiped clean.");
+        if (data.status === "cleared") {
+          showModal("🧹 Cleared", "All entries (except headers) have been wiped clean.");
+        } else {
+          showModal("❌ Error", "Failed to clear entries.");
+        }
       } catch (err) {
         console.error(err);
         showModal("💀 Error", "Failed to clear entries...");
       }
     }
 
+    // Open the live sheet
     function openAssignments() {
       window.open("https://docs.google.com/spreadsheets/d/19BT53bGqcqZHbwop8qhEFNSDQxDzEN3OqdyUfufzNHc/edit?gid=0#gid=0", "_blank");
     }
