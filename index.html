@@ -1,282 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ghoul Swap Roulette</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secret Exchange Portal</title>
   <style>
-    /* (kept your original styling with minor spacing tweaks) */
     body {
-      font-family: 'Raleway', sans-serif;
-      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') center/cover no-repeat;
+      font-family: 'Syne Mono', monospace;
+      background: url('https://images.unsplash.com/photo-1504274066651-8d31a536b11a') no-repeat center center/cover;
       color: #fff;
       text-align: center;
       min-height: 100vh;
-      margin: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      backdrop-filter: brightness(0.5);
-      overflow-x: hidden;
     }
-
-    h1 { font-size: 2.3rem; margin-bottom: 0.2em; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-    p  { font-size: 1rem; margin-bottom: 5%; color: #ddd; }
-
-    input, textarea, button { font-family: inherit; border-radius: 8px; padding: 12px 14px; border: none; margin: 6px; outline: none; }
-    input, textarea { width: 400px; text-align: center; }
-    button { cursor: pointer; transition: all 0.25s ease; }
-    button:hover { transform: scale(1.03); }
-
-    #player-section, #admin-section {
-      background: rgba(0,0,0,0.6);
-      padding: 26px;
-      border-radius: 14px;
-      width: 60%;
-      max-width: 960px;
-      margin: 20px auto;
-      box-shadow: 0 0 20px rgba(255,255,255,0.15);
-      transition: opacity 0.4s ease-in-out;
+    .container {
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
-
-    #reveal-result { font-size: 1.1rem; margin-top: 28px; color: #fff; }
-
-    #admin-section { display: none; }
-
-    textarea { resize: none; height: 120px; }
-
-    #adminBtn {
-      position: fixed; top: 15px; right: 15px;
-      background: rgba(255,255,255,0.12); color: white;
-      border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
-      padding: 8px 14px; font-size: 0.95rem; cursor: pointer;
-      backdrop-filter: blur(6px); z-index: 999;
+    input, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Syne Mono', monospace;
     }
-
-    /* Modal styles */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); justify-content: center; align-items: center; z-index: 2000; }
-    .modal.show { display: flex; }
-    .modal-box {
-      background: rgba(18,18,18,0.96); color: #fff; padding: 22px 26px; border-radius: 12px;
-      max-width: 520px; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    button {
+      background-color: #c31f48;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.2s;
     }
-    .close-btn { margin-top: 14px; background: rgba(255,255,255,0.12); color: white; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; }
-    .close-btn:hover { background: rgba(255,255,255,0.22); }
-
-    .btn-row { display:flex; gap:10px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
+    button:hover {
+      background-color: #ff2f66;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <button id="adminBtn" onclick="openAdminLogin()">Admin Login</button>
-
-  <div id="player-section">
-    <h1>🎲 Ghoul Swap Roulette 🎲</h1>
-    <p>“Whisper your email to the void, and see who fate binds you with…”</p>
-
+  <div class="container">
+    <h2>🔮 Secret Exchange Portal</h2>
+    <p>Enter your email to reveal your assigned identity...</p>
     <input type="email" id="emailInput" placeholder="Enter your email..." />
-    <button onclick="checkAssignment()">Reveal My Fate</button>
+    <button onclick="getAssignment()">Reveal</button>
 
-    <div id="reveal-result"></div>
-  </div>
-
-  <div id="admin-section">
-    <h1>🕯️ Ghoul Roulette Admin 🕯️</h1>
-
-    <label style="display:block; margin-bottom:6px; color:#ccc;">Emails (one per line)</label>
-    <textarea id="emailsInput" placeholder="alice@example.com&#10;bob@example.com"></textarea>
-
-    <label style="display:block; margin-top:12px; margin-bottom:6px; color:#ccc;">Codenames (format: Name,Gender per line — one per email in order)</label>
-    <textarea id="codenamesInput" placeholder="MysteryMaven,Female&#10;NightRogue,Male"></textarea>
-
-    <div class="btn-row">
-      <button onclick="generateAssignments()">Generate Assignments</button>
-      <button onclick="clearAssignments()">Reset All</button>
-      <button onclick="openAssignments()">Open Assignments</button>
-      <button id="closeAdmin" onclick="closeAdminPanel()">Close Admin Panel</button>
+    <div id="result" class="hidden">
+      <p id="codeName"></p>
+      <p id="gender"></p>
     </div>
 
-    <div id="adminMessage" style="margin-top:12px; color:#fffb;"></div>
-  </div>
-
-  <!-- Modal -->
-  <div id="modal" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-box">
-      <h2 id="modalTitle">Notice</h2>
-      <p id="modalMessage" style="white-space:pre-line"></p>
-      <div class="btn-row">
-        <button class="close-btn" onclick="closeModal()">Close</button>
-      </div>
-    </div>
+    <p id="error" style="color:#ff9e9e;"></p>
   </div>
 
   <script>
-    // Use the Web App URL you provided
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby50XQGzPRHlXSmSe39PEKU_CKAxK-NI8TqP4EYxpBCU50oZfgBfoEWXqBgNCrOyq5p0Q/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby50XQGzPRHlXSmSe39PEKU_CKAxK-NI8TqP4EYxpBCU50oZfgBfoEWXqBgNCrOyq5p0Q/exec"; // replace if redeployed
 
-    function showModal(title, message) {
-      document.getElementById("modalTitle").textContent = title;
-      document.getElementById("modalMessage").textContent = message;
-      document.getElementById("modal").classList.add("show");
-    }
-    function closeModal() {
-      const m = document.getElementById("modal");
-      m.classList.remove("show");
-    }
-
-    // Player: check assignment by email (GET)
-    async function checkAssignment() {
+    async function getAssignment() {
       const email = document.getElementById("emailInput").value.trim();
-      const resultDiv = document.getElementById("reveal-result");
+      const error = document.getElementById("error");
+      const result = document.getElementById("result");
+      const codeName = document.getElementById("codeName");
+      const gender = document.getElementById("gender");
+
+      error.textContent = "";
+      result.classList.add("hidden");
+
       if (!email) {
-        showModal("👻 The spirits whisper...", "They need your email to proceed.");
+        error.textContent = "Please enter your email!";
         return;
       }
-      resultDiv.textContent = "🔮 Consulting the shadows...";
-      try {
-        const res = await fetch(`${WEB_APP_URL}?action=getAssignment&email=${encodeURIComponent(email)}`);
-        if (!res.ok) throw new Error("Network error");
-        const data = await res.json();
-        if (data.found) {
-          resultDiv.innerHTML = `
-            Your email: <strong>${escapeHtml(email)}</strong><br>
-            Your fate's code name: <strong>${escapeHtml(data.codename)}</strong><br>
-            Their gender: <strong>${escapeHtml(data.gender)}</strong>
-          `;
-        } else {
-          showModal("😈 No Match Found", "The spirits found no record for this email...");
-          resultDiv.textContent = "";
-        }
-      } catch (err) {
-        console.error(err);
-        showModal("💀 Network Error", "The connection was lost in the void...");
-        resultDiv.textContent = "";
-      }
-    }
-
-    // Admin login
-    function openAdminLogin() {
-      const password = prompt("🕯️ Whisper the secret password...");
-      if (password === "escape2025") {
-        document.getElementById("player-section").style.display = "none";
-        document.getElementById("adminBtn").style.display = "none";
-        document.getElementById("admin-section").style.display = "block";
-      } else if (password !== null) {
-        showModal("👁️ Access Denied", "The shadows do not recognize you.");
-      }
-    }
-    function closeAdminPanel() {
-      document.getElementById("admin-section").style.display = "none";
-      document.getElementById("player-section").style.display = "block";
-      document.getElementById("adminBtn").style.display = "block";
-    }
-
-    // Helper: escape text for safe innerHTML fragments
-    function escapeHtml(str) {
-      if (!str) return "";
-      return String(str).replace(/[&<>"']/g, (s) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
-    }
-
-    // Generate assignments: send emails[] and codenames[] to Apps Script
-    async function generateAssignments() {
-      const emails = document.getElementById("emailsInput").value
-        .split("\n").map(s => s.trim()).filter(Boolean);
-      const codenameLines = document.getElementById("codenamesInput").value
-        .split("\n").map(s => s.trim()).filter(Boolean);
-
-      if (!emails.length || !codenameLines.length) {
-        showModal("👻 Missing Data", "Please enter both emails and code names before generating.");
-        return;
-      }
-
-      // Parse codenames input into objects { codename, gender }
-      const codenames = codenameLines.map(line => {
-        const parts = line.split(",").map(p => p.trim());
-        return { codename: parts[0] || "", gender: parts[1] || "" };
-      });
-
-      // Pairing policy: pair by index. Only pairs up to the min length will be considered.
-      const pairCount = Math.min(emails.length, codenames.length);
-      if (pairCount === 0) {
-        showModal("⚠️ Nothing to assign", "Make sure each line in the codenames input follows: Name,Gender");
-        return;
-      }
-      if (emails.length !== codenames.length) {
-        // warn admin but continue with min length pairs
-        if (!confirm(`You have ${emails.length} emails and ${codenames.length} codename lines.\nOnly the first ${pairCount} pairs will be used. Continue?`)) {
-          return;
-        }
-      }
-
-      // Build final arrays to send (only up to pairCount)
-      const sendEmails = emails.slice(0, pairCount);
-      const sendCodenames = codenames.slice(0, pairCount);
-
-      // Show a quick "working" modal
-      showModal("🔮 Generating...", `Preparing ${sendEmails.length} assignment(s) — contacting the spirits...`);
 
       try {
-        const res = await fetch(WEB_APP_URL, {
+        const response = await fetch(SCRIPT_URL, {
           method: "POST",
+          mode: "cors",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "generateAssignments",
-            emails: sendEmails,
-            codenames: sendCodenames
-          })
+          body: JSON.stringify({ action: "getAssignment", email }),
         });
 
-        if (!res.ok) {
-          throw new Error(`Server returned ${res.status}`);
-        }
-
-        const data = await res.json();
+        const data = await response.json();
 
         if (data.status === "success") {
-          const added = Number(data.added || 0);
-          if (added === sendEmails.length) {
-            showModal("✅ Success", `All ${added} assignment(s) were added.`);
-          } else if (added > 0) {
-            showModal("⚠️ Partial Success", `${added} added, ${sendEmails.length - added} skipped (they may already exist).`);
-          } else {
-            showModal("⚠️ No New Assignments", `No new rows were added. All ${sendEmails.length} email/codename pairs already exist or were invalid.`);
-          }
+          codeName.textContent = `🎭 Your Code Name: ${data.codeName}`;
+          gender.textContent = `⚧ Gender: ${data.gender}`;
+          result.classList.remove("hidden");
+        } else if (data.status === "not_found") {
+          error.textContent = "💀 Spell Failed – No match found in the sacred list.";
         } else {
-          // Show backend message if present
-          const message = data.message || data.error || "Something went wrong while generating assignments.";
-          showModal("❌ Error", message);
+          error.textContent = "☠️ Spell Failed – Something went wrong.";
         }
       } catch (err) {
-        console.error("generateAssignments error:", err);
-        showModal("💀 Spell Failed", "The incantation could not reach the spreadsheet...");
+        error.textContent = "💀 Spell Failed – The incantation could not reach the spreadsheet.";
       }
-    }
-
-    // Clear entries
-    async function clearAssignments() {
-      if (!confirm("Are you sure you want to clear all entries? This cannot be undone.")) return;
-      showModal("🧹 Clearing...", "Wiping the slate...");
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "clearEntries" })
-        });
-        if (!res.ok) throw new Error("Network error");
-        const data = await res.json();
-        if (data.status === "cleared") {
-          showModal("🧹 Cleared", "All entries (except headers) have been wiped clean.");
-        } else {
-          showModal("❌ Error", "Failed to clear entries.");
-        }
-      } catch (err) {
-        console.error(err);
-        showModal("💀 Error", "Failed to clear entries...");
-      }
-    }
-
-    // Open the live sheet
-    function openAssignments() {
-      window.open("https://docs.google.com/spreadsheets/d/19BT53bGqcqZHbwop8qhEFNSDQxDzEN3OqdyUfufzNHc/edit?gid=0#gid=0", "_blank");
     }
   </script>
 </body>
