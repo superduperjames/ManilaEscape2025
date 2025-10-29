@@ -119,27 +119,35 @@ async function checkAssignment() {
   const email = document.getElementById("emailInput").value.trim();
   const resultDiv = document.getElementById("reveal-result");
 
-  if (!email) return (resultDiv.textContent = "👻 Please enter your email first!");
+  if (!email) {
+    resultDiv.textContent = "👻 Please enter your email first!";
+    return;
+  }
 
   resultDiv.textContent = "🔮 Consulting the spirits...";
   try {
     const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
     const data = await res.json();
 
-    if (data.error) resultDiv.textContent = "💀 " + data.error;
-    else
+    if (data.error) {
+      resultDiv.textContent = "💀 " + data.error;
+    } else {
       resultDiv.innerHTML = `🕯️ <b>Code Name:</b> ${data.assignedCodeName}<br>🎭 <b>Gender:</b> ${data.assignedGender}`;
-catch (err) {
-  console.error("Fetch error in checkAssignment():", err);
-  resultDiv.textContent = "💀 Something went wrong. Check the console for details.";
-}
+    }
+  } catch (err) {
+    console.error("Fetch error in checkAssignment():", err);
+    resultDiv.textContent = "💀 Something went wrong. Check the console for details.";
+  }
 }
 
 async function generateAssignments() {
   const emails = document.getElementById("emailsInput").value.trim();
   const codenames = document.getElementById("codenamesInput").value.trim();
 
-  if (!emails || !codenames) return alert("⚠️ Please fill out both fields first!");
+  if (!emails || !codenames) {
+    alert("⚠️ Please fill out both fields first!");
+    return;
+  }
 
   try {
     const body = new FormData();
@@ -149,26 +157,28 @@ async function generateAssignments() {
     const res = await fetch(SCRIPT_URL, { method: "POST", body });
     const data = await res.json();
 
-    if (data.status === "success") alert("🎲 Assignments have been randomized successfully!");
-    else throw new Error(data.error || "Something went wrong.");
-catch (err) {
-  console.error("Fetch error in generateAssignments():", err);
-  alert("💀 Error: " + err.message + "\n(Check console for full details.)");
-}
-
+    if (data.status === "success") {
+      alert("🎲 Assignments have been randomized successfully!");
+    } else {
+      throw new Error(data.error || "Something went wrong.");
+    }
+  } catch (err) {
+    console.error("Fetch error in generateAssignments():", err);
+    alert("💀 Error: " + err.message + "\n(Check console for full details.)");
+  }
 }
 
 async function clearAssignments() {
   if (!confirm("⚠️ Are you sure you want to reset all assignments?")) return;
+
   try {
     const res = await fetch(`${SCRIPT_URL}?reset=true`);
     const data = await res.json();
     alert("🧹 All assignments cleared!");
-catch (err) {
-  console.error("Fetch error in clearAssignments():", err);
-  alert("💀 Error clearing assignments. Check console for details.");
-}
-
+  } catch (err) {
+    console.error("Fetch error in clearAssignments():", err);
+    alert("💀 Error clearing assignments. Check console for details.");
+  }
 }
 
 function openAssignments() {
@@ -180,13 +190,16 @@ function openAdminLogin() {
   document.getElementById("player-section").style.display = "none";
   document.getElementById("admin-section").style.display = "block";
 }
+
 function closeAdminPanel() {
   document.getElementById("admin-section").style.display = "none";
   document.getElementById("player-section").style.display = "block";
 }
+
 function closeModal() {
   document.getElementById("modal").classList.remove("show");
 }
 </script>
+
 </body>
 </html>
