@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ghoul Roulette Portal</title>
+  <title>Ghoul Swap Roulette</title>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -20,7 +20,7 @@
     }
 
     h1 {
-      font-family: 'Syne Mono', monospace;
+      font-family: 'Raleway', sans-serif;
       font-size: 2.3rem;
       margin-bottom: 0.2em;
       text-shadow: 0 0 10px rgba(255,255,255,0.3);
@@ -185,6 +185,23 @@
     .close-btn:hover {
       background: rgba(255,255,255,0.4);
     }
+
+    #closeAdmin {
+      margin-top: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: all 0.3s ease;
+    }
+
+    #closeAdmin:hover {
+      background: rgba(255,255,255,0.35);
+    }
   </style>
 </head>
 <body>
@@ -207,12 +224,10 @@
     <textarea id="codenamesInput" placeholder="Enter codenames (format: Name,Gender per line)..."></textarea>
     <button onclick="generateAssignments()">Generate Assignments</button>
     <button onclick="clearAssignments()">Reset All</button>
+    <button onclick="openAssignments()">Open Assignments</button>
+    <button id="closeAdmin" onclick="closeAdminPanel()">Close Admin Panel</button>
 
     <div id="adminMessage" style="margin-top:10px;"></div>
-
-    <div style="margin-top:20px;">
-      <button onclick="openAssignments()">Open Assignments</button>
-    </div>
   </div>
 
   <!-- Modal -->
@@ -281,6 +296,12 @@
       } else if (password !== null) {
         showModal("👁️ Access Denied", "The shadows do not recognize you.");
       }
+    }
+
+    function closeAdminPanel() {
+      document.getElementById("admin-section").style.display = "none";
+      document.getElementById("player-section").style.display = "block";
+      document.getElementById("adminBtn").style.display = "block";
     }
 
     async function generateAssignments() {
