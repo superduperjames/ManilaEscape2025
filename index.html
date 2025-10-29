@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Secret Exchange Portal</title>
+  <title>🎃 Ghoul Roulette</title>
   <style>
     body {
       font-family: 'Syne Mono', monospace;
@@ -14,16 +14,17 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      margin: 0;
     }
     .container {
       background: rgba(0,0,0,0.7);
       padding: 30px;
       border-radius: 16px;
-      max-width: 400px;
+      max-width: 450px;
       margin: auto;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
     }
-    input, button {
+    input, textarea, button {
       width: 100%;
       margin: 8px 0;
       padding: 10px;
@@ -40,18 +41,21 @@
     button:hover {
       background-color: #ff2f66;
     }
-    #result {
+    .hidden { display: none; }
+    #result { margin-top: 20px; }
+    #adminPanel {
       margin-top: 20px;
-    }
-    .hidden {
-      display: none;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>🔮 Secret Exchange Portal</h2>
-    <p>Enter your email to reveal your assigned identity...</p>
+    <h2>☠️ Ghoul Roulette ☠️</h2>
+    <p>Enter your email to unveil your dark identity...</p>
+
     <input type="email" id="emailInput" placeholder="Enter your email..." />
     <button onclick="getAssignment()">Reveal</button>
 
@@ -61,6 +65,18 @@
     </div>
 
     <p id="error" style="color:#ff9e9e;"></p>
+
+    <button id="adminToggle" onclick="toggleAdminPanel()">🩸 Admin Access</button>
+
+    <div id="adminPanel" class="hidden">
+      <h3>🕸 Ghoul Roulette Admin 🕸</h3>
+      <textarea id="emails" rows="4" placeholder="Emails (one per line)"></textarea>
+      <textarea id="pairs" rows="4" placeholder="Codenames,Gender (one per line, same order as emails)"></textarea>
+      <button onclick="addAssignments()">Generate Assignments</button>
+      <button onclick="clearAssignments()">Reset All</button>
+      <button onclick="closeAdminPanel()">Close Admin Panel</button>
+      <p id="adminStatus"></p>
+    </div>
   </div>
 
   <script>
@@ -84,13 +100,11 @@
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "getAssignment", email }),
         });
 
         const data = await response.json();
-
         if (data.status === "success") {
           codeName.textContent = `🎭 Your Code Name: ${data.codeName}`;
           gender.textContent = `⚧ Gender: ${data.gender}`;
@@ -102,6 +116,66 @@
         }
       } catch (err) {
         error.textContent = "💀 Spell Failed – The incantation could not reach the spreadsheet.";
+      }
+    }
+
+    function toggleAdminPanel() {
+      document.getElementById("adminPanel").classList.toggle("hidden");
+    }
+
+    function closeAdminPanel() {
+      document.getElementById("adminPanel").classList.add("hidden");
+    }
+
+    async function addAssignments() {
+      const emails = document.getElementById("emails").value.trim().split("\n").map(e => e.trim()).filter(Boolean);
+      const pairs = document.getElementById("pairs").value.trim().split("\n").map(p => p.trim()).filter(Boolean);
+      const status = document.getElementById("adminStatus");
+      status.textContent = "";
+
+      if (emails.length !== pairs.length) {
+        status.textContent = "⚠️ Mismatch: Make sure each email has one codename,gender line.";
+        return;
+      }
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "addAssignments", emails, pairs }),
+        });
+
+        const data = await response.json();
+        if (data.status === "added") {
+          status.textContent = `✅ Added ${data.addedCount} new assignments! (existing ones untouched)`;
+        } else {
+          status.textContent = `⚠️ ${data.message || "Unknown error."}`;
+        }
+      } catch {
+        status.textContent = "💀 Spell Failed – Could not reach the spreadsheet.";
+      }
+    }
+
+    async function clearAssignments() {
+      const status = document.getElementById("adminStatus");
+      status.textContent = "";
+      if (!confirm("☠️ Are you sure you want to clear all assignments?")) return;
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "clearAssignments" }),
+        });
+
+        const data = await response.json();
+        if (data.status === "cleared") {
+          status.textContent = "🧹 All assignments have been cleared!";
+        } else {
+          status.textContent = "⚠️ Could not clear assignments.";
+        }
+      } catch {
+        status.textContent = "💀 Spell Failed – Could not reach the spreadsheet.";
       }
     }
   </script>
