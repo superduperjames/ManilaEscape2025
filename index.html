@@ -237,7 +237,7 @@
       resultDiv.textContent = "Summoning your fate...";
       const r = await getAction({ action: "getAssignment", email });
       if (r.ok) {
-        resultDiv.textContent = `🎃 Your code name is: ${r.code} (${r.gender})`;
+        resultDiv.textContent = `🎃 Your fate's code name and gender is: ${r.code} (${r.gender})`;
       } else {
         resultDiv.textContent = `👻 ${r.message}`;
       }
