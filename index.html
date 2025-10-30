@@ -112,7 +112,7 @@
   </div>
 
   <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_Mh5FtaWG26eUP_MQwyp3FgP2uYgw86faboqEIcR4NxTy-mfFf3PkX5JgUgtwXYB-/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIQTZzCsAEBAwM49GjzK6C0kdXtD6lGFvtWn2iiKpKrrCRX9R8P2ATsKKy-KZguw8/exec";
 
 // 🧿 Reveal assigned partner
 async function checkAssignment() {
@@ -128,6 +128,7 @@ async function checkAssignment() {
 
   try {
     const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
     const data = await res.json();
 
     if (data.error) {
@@ -137,11 +138,11 @@ async function checkAssignment() {
     }
   } catch (err) {
     console.error("Fetch error:", err);
-    resultDiv.textContent = "💀 Failed to reach the spirits. Try again soon.";
+    resultDiv.textContent = "💀 Failed to reach the spirits. Check your connection or try again.";
   }
 }
 
-// 🧩 Admin: Generate Assignments (JSON-based now)
+// 🧩 Admin: Generate Assignments
 async function generateAssignments() {
   const emails = document.getElementById("emailsInput").value.trim();
   const codenames = document.getElementById("codenamesInput").value.trim();
@@ -155,9 +156,10 @@ async function generateAssignments() {
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emails, codenames }),
+      body: JSON.stringify({ emails, codenames })
     });
 
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
     const data = await res.json();
 
     if (data.status === "success") {
@@ -177,10 +179,12 @@ async function clearAssignments() {
 
   try {
     const res = await fetch(`${SCRIPT_URL}?reset=true`);
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
     await res.json();
     alert("🧹 All assignments cleared!");
   } catch (err) {
-    alert("💀 Failed to clear assignments. Try again later.");
+    console.error("Error in clearAssignments():", err);
+    alert("💀 Failed to clear assignments. Please try again.");
   }
 }
 
