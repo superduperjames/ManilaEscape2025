@@ -1,1 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ghoul Swap Roulette</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #e81b1b;
+      --accent-glow: #ff4747;
+      --dark: #0a0a0a;
+      --panel: rgba(0,0,0,0.6);
+      --text: #f5f5f5;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1761682061/_James%20Assets/.test%20app%20assets/MML%20October%202025/62422-504238932_small-ezgif.com-video-to-gif-converter.gif') center/cover no-repeat fixed;
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      overflow: hidden;
+    }
+
+    .veil {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75);
+      z-index: -1;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 60px auto;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 15px;
+      box-shadow: 0 0 60px rgba(232,27,27,0.2);
+      padding: 30px;
+      backdrop-filter: blur(5px);
+      position: relative;
+    }
+
+    h1 {
+      font-family: 'Creepster', cursive;
+      font-size: 48px;
+      color: var(--accent-glow);
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .admin-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 20px;
+      background: none;
+      color: var(--accent-glow);
+      border: none;
+      cursor: pointer;
+      text-shadow: 0 0 8px var(--accent-glow);
+      transition: transform .2s ease;
+    }
+    .admin-btn:hover { transform: scale(1.2) rotate(10deg); }
+
+    input, textarea {
+      width: 100%;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: 'Raleway', sans-serif;
+    }
+
+    button {
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      color: #fff;
+      font-family: 'Raleway', sans-serif;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255,0,0,0.5);
+    }
+    button:hover {
+      background: var(--accent-glow);
+      box-shadow: 0 0 25px var(--accent-glow);
+    }
+    button.ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: var(--text);
+    }
+
+    #roulette {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #2a0000, #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin: 20px auto;
+      position: relative;
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 40px rgba(232,27,27,0.5);
+      transition: all 0.3s ease;
+    }
+
+    #roulette:hover {
+      box-shadow: 0 0 60px var(--accent-glow);
+    }
+
+    #needle {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 80px;
+      background: var(--accent-glow);
+      box-shadow: 0 0 15px var(--accent-glow);
+      border-radius: 4px;
+    }
+
+    .panel {
+      background: rgba(0,0,0,0.6);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
+    }
+
+    .row {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .small { font-size: 13px; color: #bbb; }
+
+    #result {
+      font-size: 20px;
+      color: var(--accent-glow);
+      text-align: center;
+      margin-top: 10px;
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .admin-panel {
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      width: 420px;
+      max-width: 90vw;
+      background: rgba(0,0,0,0.9);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(232,27,27,0.4);
+      display: none;
+      z-index: 100;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .spinner {
+      display:inline-block;width:18px;height:18px;border-radius:50%;
+      border:3px solid rgba(255,255,255,.08);border-top-color:var(--accent-glow);
+      animation:spin 1s linear infinite;margin-left:8px;
+    }
+    @keyframes spin {to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <div class="veil"></div>
+  <div class="wrap">
+    <button class="admin-btn" id="adminToggle">☠</button>
+    <h1>Ghoul Swap Roulette</h1>
+
+    <div class="row">
+      <div style="flex:1;min-width:300px">
+        <div class="panel">
+          <label class="small">Enter your email (the cursed list awaits):</label>
+          <input type="email" id="emailInput" placeholder="your@email.com">
+          <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+            <button id="spinBtn">Spin the Fate</button>
+            <button id="quickShow" class="ghost">Reveal My Secret</button>
+            <div id="busy" style="display:none"><span class="spinner"></span></div>
+          </div>
+          <div id="result">No fate revealed... yet.</div>
+        </div>
+      </div>
+
+      <div>
+        <div id="roulette">
+          <div id="needle"></div>
+          🕸️
+        </div>
+        <div class="small" style="text-align:center;">Let the shadows decide your destiny.</div>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong>Admin Panel</strong>
+        <small class="small" id="adminStatus">locked</small>
+      </div>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.2);margin:8px 0;" />
+      <div id="adminContent" style="display:none;">
+        <div class="small">Emails (one per line)</div>
+        <textarea id="emailsText" rows="5"></textarea>
+        <div class="small" style="margin-top:8px;">Code Names (one per line)</div>
+        <textarea id="codesText" rows="4"></textarea>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="saveLists">Save Lists</button>
+          <button id="generate" class="ghost">Generate Assignments</button>
+          <button id="reset" class="ghost">Reset Assignments</button>
+          <button id="seeResults" class="ghost">Open Sheet</button>
+        </div>
+        <div id="adminMsg" class="small" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_WEB_APP_URL = "REPLACE_WITH_YOUR_APPS_SCRIPT_WEB_APP_URL";
+    const adminToggle=document.getElementById('adminToggle');
+    const adminPanel=document.getElementById('adminPanel');
+    const adminContent=document.getElementById('adminContent');
+    const adminStatus=document.getElementById('adminStatus');
+    const adminMsg=document.getElementById('adminMsg');
+    const emailInput=document.getElementById('emailInput');
+    const spinBtn=document.getElementById('spinBtn');
+    const quickShow=document.getElementById('quickShow');
+    const resultEl=document.getElementById('result');
+    const busy=document.getElementById('busy');
+    let adminUnlocked=false;
+
+    adminToggle.addEventListener('click',()=> {
+      if(!adminUnlocked){
+        const p=prompt("Enter the forbidden password:");
+        if(!p) return;
+        verifyAdminPassword(p).then(ok=>{
+          if(ok){adminUnlocked=true;adminStatus.textContent="unlocked";adminPanel.style.display='block';adminContent.style.display='block';adminMsg.textContent="Admin unlocked.";}
+          else alert("Wrong password, mortal.");
+        });
+      } else {
+        adminUnlocked=false;adminStatus.textContent="locked";adminPanel.style.display='none';adminContent.style.display='none';
+      }
+    });
+
+    document.getElementById('saveLists').addEventListener('click',async()=>{
+      const emails=document.getElementById('emailsText').value.trim();
+      const codes=document.getElementById('codesText').value.trim();
+      if(!emails||!codes){adminMsg.textContent="Empty fields are forbidden.";return;}
+      adminMsg.textContent="Saving...";
+      try{const res=await apiPost({action:'saveLists',payload:{emails:emails.split(/\\r?\\n/),codes:codes.split(/\\r?\\n/)},adminPassword:promptAdminPassword()});adminMsg.textContent=res.message||"Saved.";}catch(e){adminMsg.textContent="Error: "+e.message;}
+    });
+
+    document.getElementById('generate').addEventListener('click',async()=>{
+      if(!confirm("Generate fates for all?"))return;
+      adminMsg.textContent="Summoning...";
+      try{const res=await apiPost({action:'generateAssignments',adminPassword:promptAdminPassword()});adminMsg.textContent=res.message||"Generated.";}catch(e){adminMsg.textContent="Error: "+e.message;}
+    });
+
+    document.getElementById('reset').addEventListener('click',async()=>{
+      if(!confirm("Purge all fates?"))return;
+      adminMsg.textContent="Purging...";
+      try{const res=await apiPost({action:'resetAssignments',adminPassword:promptAdminPassword()});adminMsg.textContent=res.message||"Reset.";}catch(e){adminMsg.textContent="Error: "+e.message;}
+    });
+
+    document.getElementById('seeResults').addEventListener('click',async()=>{
+      try{const res=await apiGet({action:'getSheetUrl'});if(res.sheetUrl)window.open(res.sheetUrl,'_blank');else adminMsg.textContent="No portal link found.";}catch(e){adminMsg.textContent="Error: "+e.message;}
+    });
+
+    spinBtn.addEventListener('click',async()=>{
+      const email=emailInput.value.trim().toLowerCase();
+      if(!/\\S+@\\S+\\.\\S+/.test(email)){alert('Enter a valid email, mortal.');return;}
+      await showBusy(true);
+      try{
+        const res=await apiGet({action:'getAssignment',email});
+        if(!res.ok){resultEl.textContent=res.message||"Not found.";}
+        else{await animateRoulette();resultEl.textContent="Your code name: "+res.code;}
+      }catch(e){resultEl.textContent="Error: "+e.message;}
+      finally{await showBusy(false);}
+    });
+
+    quickShow.addEventListener('click',async()=>{
+      const email=emailInput.value.trim().toLowerCase();
+      if(!/\\S+@\\S+\\.\\S+/.test(email)){alert('Enter a valid email.');return;}
+      await showBusy(true);
+      try{
+        const res=await apiGet({action:'getAssignment',email});
+        resultEl.textContent=res.ok?"Assigned: "+res.code:"Not found.";
+      }catch(e){resultEl.textContent="Error: "+e.message;}
+      finally{await showBusy(false);}
+    });
+
+    function promptAdminPassword(){const p=prompt("Re-enter admin password:");if(!p)throw new Error("Password required");return p;}
+    async function verifyAdminPassword(p){const res=await apiPost({action:'verifyAdmin',adminPassword:p});return!!res.ok;}
+    function apiGet(params){const url=new URL(APPS_SCRIPT_WEB_APP_URL);Object.keys(params||{}).forEach(k=>url.searchParams.set(k,params[k]));return fetch(url).then(r=>r.json());}
+    function apiPost(body){return fetch(APPS_SCRIPT_WEB_APP_URL+'?action='+encodeURIComponent(body.action||''),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());}
+    function showBusy(on){busy.style.display=on?'inline-block':'none';spinBtn.disabled=on;quickShow.disabled=on;return Promise.resolve();}
+    function animateRoulette(){return new Promise(resolve=>{const el=document.getElementById('roulette');el.animate([{transform:'rotate(0deg)'},{transform:'rotate(2160deg)'}],{duration:1600,easing:'cubic-bezier(.3,.7,.3,1)'});setTimeout(resolve,1600);});}
+  </script>
+</body>
+</html>
 
