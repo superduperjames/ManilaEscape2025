@@ -156,7 +156,7 @@
   </div>
 
   <script>
-    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwOcIS1jSJYL_H_sKqQoi8vnv5XSqNWmPRtfd5Yxr4s7187p-9aSfzLDYFy_-H9xkL4/exec"; // Your web app URL
+    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxjAMfVH77z8sqMeganE4ul_IW3tuTFISDF0WQHVUVHAGepbLVPEqSQt6oBBfzzvhQV/exec"; // e.g., https://script.google.com/macros/s/XXX/exec
     const ADMIN_PASSWORD = "escape2025";
 
     const adminBtn = document.getElementById("adminBtn");
@@ -184,19 +184,27 @@
     });
 
     async function postAction(body) {
-      const res = await fetch(APPS_SCRIPT_WEB_APP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-      return res.json();
+      try {
+        const res = await fetch(APPS_SCRIPT_WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        return res.json();
+      } catch (err) {
+        return { ok: false, message: "Fetch failed: " + err };
+      }
     }
 
     async function getAction(params) {
-      const url = new URL(APPS_SCRIPT_WEB_APP_URL);
-      Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-      const res = await fetch(url);
-      return res.json();
+      try {
+        const url = new URL(APPS_SCRIPT_WEB_APP_URL);
+        Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+        const res = await fetch(url);
+        return res.json();
+      } catch (err) {
+        return { ok: false, message: "Fetch failed: " + err };
+      }
     }
 
     // ===== Admin actions =====
