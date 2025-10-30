@@ -112,38 +112,67 @@
   </div>
 
   <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxztuGzHUT2MDcSwc5-5EQ55eqg0Limx5db_lhKFLNWap-Xb35Q_S3NA_WTHFQAlnVJ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzW_-3whq4IHtPLoBZBf07wiHdirkLymAMptmWR8jyptAZ92yUXCkXKHyhwO1CDZA/exec"; // <-- replace
 
-// 🧿 Reveal assigned partner
+// reveal (GET) — unchanged, uses fetch GET (works)
 async function checkAssignment() {
   const email = document.getElementById("emailInput").value.trim();
   const resultDiv = document.getElementById("reveal-result");
-
-  if (!email) {
-    resultDiv.textContent = "👻 Please enter your email first!";
-    return;
-  }
-
+  if (!email) { resultDiv.textContent = "👻 Please enter your email first!"; return; }
   resultDiv.textContent = "🔮 Consulting the spirits...";
-
   try {
     const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+    if (!res.ok) throw new Error(`Server ${res.status}`);
     const data = await res.json();
-
-    if (data.error) {
-      resultDiv.textContent = "💀 " + data.error;
-    } else {
-      resultDiv.innerHTML = `🕯️ <b>Code Name:</b> ${data.assignedCodeName}<br>🎭 <b>Gender:</b> ${data.assignedGender}`;
-    }
+    if (data.error) resultDiv.textContent = "💀 " + data.error;
+    else resultDiv.innerHTML = `🕯️ <b>Code Name:</b> ${data.assignedCodeName}<br>🎭 <b>Gender:</b> ${data.assignedGender}`;
   } catch (err) {
-    console.error("Fetch error:", err);
-    resultDiv.textContent = "💀 Failed to reach the spirits. Check your connection or try again.";
+    console.error(err);
+    resultDiv.textContent = "💀 Failed to reach the spirits. Try again later.";
   }
 }
 
-// 🧩 Admin: Generate Assignments
-async function generateAssignments() {
+// Helper: create and submit hidden form to avoid CORS for POST
+function postToScriptAsForm({ emails, codenames }) {
+  // create a hidden iframe target so page doesn't navigate away
+  const iframeName = "gs_post_iframe_" + Date.now();
+  const iframe = document.createElement("iframe");
+  iframe.name = iframeName;
+  iframe.style.display = "none";
+  document.body.appendChild(iframe);
+
+  // create form
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = SCRIPT_URL;
+  form.target = iframeName;
+
+  // plain text fields (form-encoded)
+  const f1 = document.createElement("textarea");
+  f1.name = "emails";
+  f1.value = emails;
+  form.appendChild(f1);
+
+  const f2 = document.createElement("textarea");
+  f2.name = "codenames";
+  f2.value = codenames;
+  form.appendChild(f2);
+
+  form.style.display = "none";
+  document.body.appendChild(form);
+
+  // submit
+  form.submit();
+
+  // cleanup after a second
+  setTimeout(() => {
+    form.remove();
+    iframe.remove();
+  }, 2000);
+}
+
+// Admin: generate assignments — uses form POST to avoid CORS
+function generateAssignments() {
   const emails = document.getElementById("emailsInput").value.trim();
   const codenames = document.getElementById("codenamesInput").value.trim();
 
@@ -152,48 +181,37 @@ async function generateAssignments() {
     return;
   }
 
+  // Submit as form (no CORS issues). We can't read server JSON response because of cross-origin browser policy,
+  // but the Apps Script will still process/save the data.
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emails, codenames })
-    });
-
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-    const data = await res.json();
-
-    if (data.status === "success") {
-      alert("🎲 Assignments have been randomized successfully!");
-    } else {
-      throw new Error(data.error || "Unknown error occurred.");
-    }
+    postToScriptAsForm({ emails, codenames });
+    // Let the user know; the sheet will be updated server-side.
+    alert("🎲 Assignments submitted. Please check the Google Sheet for updated assignments in a few seconds.");
   } catch (err) {
-    console.error("Error in generateAssignments():", err);
-    alert("💀 Error: " + err.message);
+    console.error(err);
+    alert("💀 Error submitting assignments: " + err.message);
   }
 }
 
-// 🧹 Reset all data
+// Reset all data (GET reset)
 async function clearAssignments() {
   if (!confirm("⚠️ Are you sure you want to reset all assignments?")) return;
-
   try {
     const res = await fetch(`${SCRIPT_URL}?reset=true`);
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-    await res.json();
-    alert("🧹 All assignments cleared!");
+    if (!res.ok) throw new Error(`Server ${res.status}`);
+    const data = await res.json();
+    if (data.status === "cleared") alert("🧹 All assignments cleared!");
+    else alert("⚠️ Reset request complete; check sheet.");
   } catch (err) {
-    console.error("Error in clearAssignments():", err);
-    alert("💀 Failed to clear assignments. Please try again.");
+    console.error(err);
+    alert("💀 Failed to clear assignments. Try again.");
   }
 }
 
-// 📜 Open sheet link
+// other helpers (open assignments, admin toggles)
 function openAssignments() {
-  window.open("https://docs.google.com/spreadsheets/d/1SYO1JXSp9lU_J7XgJ4xkIgi8Uw7bXvY7H53jZ6h2ZBA/edit#gid=0", "_blank");
+  window.open("https://docs.google.com/spreadsheets/d/1j2Q7vJWpkTwAaPEpmQfETHyYTiorAdo7XyEn_oGDCoU/edit#gid=0", "_blank");
 }
-
-// Admin panel controls
 function openAdminLogin() {
   document.getElementById("player-section").style.display = "none";
   document.getElementById("admin-section").style.display = "block";
