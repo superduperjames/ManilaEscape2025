@@ -112,42 +112,53 @@
   </div>
 
   <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2y26RMiJfjJv8b4swy5pKDoI30lw_esh7evGLB99p2i-N_TFsY_znp9jcBrGJObaB/exec"; // <-- replace
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzypwJFHjT6ifFeb-m2PDmqE--GSMtmhuSFckB8OXHdFIyiyxAR3fBytyHYFXGEmuCs/exec"; // <-- replace
 
-// reveal (GET) — unchanged, uses fetch GET (works)
+// 🕯️ Reveal assigned code name + gender
 async function checkAssignment() {
   const email = document.getElementById("emailInput").value.trim();
   const resultDiv = document.getElementById("reveal-result");
-  if (!email) { resultDiv.textContent = "👻 Please enter your email first!"; return; }
+
+  if (!email) {
+    resultDiv.textContent = "👻 Please enter your email first!";
+    return;
+  }
+
   resultDiv.textContent = "🔮 Consulting the spirits...";
   try {
     const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
-    if (!res.ok) throw new Error(`Server ${res.status}`);
+    if (!res.ok) throw new Error(`Server returned ${res.status}`);
     const data = await res.json();
-    if (data.error) resultDiv.textContent = "💀 " + data.error;
-    else resultDiv.innerHTML = `🕯️ <b>Code Name:</b> ${data.assignedCodeName}<br>🎭 <b>Gender:</b> ${data.assignedGender}`;
+
+    if (data.error) {
+      resultDiv.textContent = "💀 " + data.error;
+    } else if (data.assignedCodeName && data.assignedGender) {
+      resultDiv.innerHTML = `🕯️ <b>Code Name:</b> ${data.assignedCodeName}<br>🎭 <b>Gender:</b> ${data.assignedGender}`;
+    } else {
+      resultDiv.textContent = "💀 No assignment found. Please try again later.";
+    }
   } catch (err) {
     console.error(err);
     resultDiv.textContent = "💀 Failed to reach the spirits. Try again later.";
   }
 }
 
-// Helper: create and submit hidden form to avoid CORS for POST
-function postToScriptAsForm({ emails, codenames }) {
-  // create a hidden iframe target so page doesn't navigate away
-  const iframeName = "gs_post_iframe_" + Date.now();
-  const iframe = document.createElement("iframe");
-  iframe.name = iframeName;
-  iframe.style.display = "none";
-  document.body.appendChild(iframe);
+// 🧙‍♀️ Admin: submit assignments via hidden form (avoids CORS)
+function generateAssignments() {
+  const emails = document.getElementById("emailsInput").value.trim();
+  const codenames = document.getElementById("codenamesInput").value.trim();
 
-  // create form
+  if (!emails || !codenames) {
+    alert("⚠️ Please fill out both fields first!");
+    return;
+  }
+
+  // build form POST
   const form = document.createElement("form");
   form.method = "POST";
   form.action = SCRIPT_URL;
-  form.target = iframeName;
+  form.style.display = "none";
 
-  // plain text fields (form-encoded)
   const f1 = document.createElement("textarea");
   f1.name = "emails";
   f1.value = emails;
@@ -158,60 +169,38 @@ function postToScriptAsForm({ emails, codenames }) {
   f2.value = codenames;
   form.appendChild(f2);
 
-  form.style.display = "none";
   document.body.appendChild(form);
-
-  // submit
   form.submit();
 
-  // cleanup after a second
-  setTimeout(() => {
-    form.remove();
-    iframe.remove();
-  }, 2000);
+  alert("🎲 Assignments submitted. Please check the Google Sheet for updates shortly.");
+
+  setTimeout(() => form.remove(), 2000);
 }
 
-// Admin: generate assignments — uses form POST to avoid CORS
-function generateAssignments() {
-  const emails = document.getElementById("emailsInput").value.trim();
-  const codenames = document.getElementById("codenamesInput").value.trim();
-
-  if (!emails || !codenames) {
-    alert("⚠️ Please fill out both fields first!");
-    return;
-  }
-
-  // Submit as form (no CORS issues). We can't read server JSON response because of cross-origin browser policy,
-  // but the Apps Script will still process/save the data.
-  try {
-    postToScriptAsForm({ emails, codenames });
-    // Let the user know; the sheet will be updated server-side.
-    alert("🎲 Assignments submitted. Please check the Google Sheet for updated assignments in a few seconds.");
-  } catch (err) {
-    console.error(err);
-    alert("💀 Error submitting assignments: " + err.message);
-  }
-}
-
-// Reset all data (GET reset)
+// 🧹 Clear all assignments
 async function clearAssignments() {
   if (!confirm("⚠️ Are you sure you want to reset all assignments?")) return;
   try {
     const res = await fetch(`${SCRIPT_URL}?reset=true`);
-    if (!res.ok) throw new Error(`Server ${res.status}`);
+    if (!res.ok) throw new Error(`Server returned ${res.status}`);
     const data = await res.json();
-    if (data.status === "cleared") alert("🧹 All assignments cleared!");
-    else alert("⚠️ Reset request complete; check sheet.");
+    if (data.status === "cleared") {
+      alert("🧹 All assignments cleared!");
+    } else {
+      alert("⚠️ Reset request sent. Please check the sheet.");
+    }
   } catch (err) {
     console.error(err);
-    alert("💀 Failed to clear assignments. Try again.");
+    alert("💀 Failed to clear assignments. Try again later.");
   }
 }
 
-// other helpers (open assignments, admin toggles)
+// 🪄 Open spreadsheet link
 function openAssignments() {
   window.open("https://docs.google.com/spreadsheets/d/1j2Q7vJWpkTwAaPEpmQfETHyYTiorAdo7XyEn_oGDCoU/edit#gid=0", "_blank");
 }
+
+// 🎭 Admin panel toggles
 function openAdminLogin() {
   document.getElementById("player-section").style.display = "none";
   document.getElementById("admin-section").style.display = "block";
@@ -220,6 +209,8 @@ function closeAdminPanel() {
   document.getElementById("admin-section").style.display = "none";
   document.getElementById("player-section").style.display = "block";
 }
+
+// ☠️ Modal controls (optional)
 function closeModal() {
   document.getElementById("modal").classList.remove("show");
 }
