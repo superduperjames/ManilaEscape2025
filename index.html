@@ -112,7 +112,7 @@
   </div>
 
   <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvIXbK1n5qZL3BpScw5jY4_k370DFs6PtZf4rDgzfiA7WytqRolZmW_g55vBKVqWAE/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIFOHW55bIRb6nQHkKU3rAvzNI6Xn73GuSdXs-g0c-l1POClw5HIywUJsrIQ1NMlY/exec";
 
 // 🧿 Reveal assigned partner
 async function checkAssignment() {
@@ -127,8 +127,7 @@ async function checkAssignment() {
   resultDiv.textContent = "🔮 Consulting the spirits...";
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`, { method: "GET" });
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+    const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
     const data = await res.json();
 
     if (data.error) {
@@ -138,11 +137,11 @@ async function checkAssignment() {
     }
   } catch (err) {
     console.error("Fetch error:", err);
-    resultDiv.textContent = "💀 Failed to reach the spirits. Check your connection or try again.";
+    resultDiv.textContent = "💀 Failed to reach the spirits. Try again soon.";
   }
 }
 
-// 🧩 Admin: Generate Assignments
+// 🧩 Admin: Generate Assignments (JSON-based now)
 async function generateAssignments() {
   const emails = document.getElementById("emailsInput").value.trim();
   const codenames = document.getElementById("codenamesInput").value.trim();
@@ -153,9 +152,12 @@ async function generateAssignments() {
   }
 
   try {
-    const body = new URLSearchParams({ emails, codenames });
-    const res = await fetch(SCRIPT_URL, { method: "POST", body });
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ emails, codenames }),
+    });
+
     const data = await res.json();
 
     if (data.status === "success") {
@@ -174,13 +176,11 @@ async function clearAssignments() {
   if (!confirm("⚠️ Are you sure you want to reset all assignments?")) return;
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?reset=true`, { method: "GET" });
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+    const res = await fetch(`${SCRIPT_URL}?reset=true`);
     await res.json();
     alert("🧹 All assignments cleared!");
   } catch (err) {
-    console.error("Error in clearAssignments():", err);
-    alert("💀 Failed to clear assignments. Please try again.");
+    alert("💀 Failed to clear assignments. Try again later.");
   }
 }
 
@@ -201,6 +201,6 @@ function closeAdminPanel() {
 function closeModal() {
   document.getElementById("modal").classList.remove("show");
 }
-  </script>
+</script>
 </body>
 </html>
