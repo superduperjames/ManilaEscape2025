@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ghoul Swap Roulette</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
 
     body {
       margin: 0;
-      font-family: 'Amatic SC', sans-serif;
+      font-family: 'Creepster', cursive;
       color: #f1f1f1;
-      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1759429344/_James%20Assets/.test%20app%20assets/MML%20October%202025/ezgif.com-effects.gif') center/cover fixed no-repeat;
+      background: url('https://res.cloudinary.com/eventmobi/image/upload/v1761682061/_James%20Assets/.test%20app%20assets/MML%20October%202025/62422-504238932_small-ezgif.com-video-to-gif-converter.gif') center/cover fixed no-repeat;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -45,7 +45,7 @@
     }
 
     button {
-      font-family: 'Amatic SC', sans-serif;
+      font-family: 'Creepster', cursive;
       background: #7b0000;
       color: #fff;
       border: none;
@@ -148,16 +148,15 @@
       <textarea id="emailsText" placeholder="Emails (one per line)"></textarea>
       <textarea id="codesText" placeholder="Codenames and Gender (one per line, comma or tab separated)"></textarea>
       <br>
-      <button id="saveListsBtn">Save Lists</button>
       <button id="generate">Generate Assignments</button>
       <button id="reset">Reset List</button>
-      <button id="seeResults">Open List</button>
+      <button id="seeResults">Open Sheet</button>
       <div id="adminMsg"></div>
     </div>
   </div>
 
   <script>
-    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwa0LPjNrc-bJvwgsYPRNVRayGAJDyXMwveh_cuQN7mvqw-fBYoba8yU-V6NCOleAnx/exec"; // Put your web app URL here
+    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwOcIS1jSJYL_H_sKqQoi8vnv5XSqNWmPRtfd5Yxr4s7187p-9aSfzLDYFy_-H9xkL4/exec"; // Your web app URL
     const ADMIN_PASSWORD = "escape2025";
 
     const adminBtn = document.getElementById("adminBtn");
@@ -201,17 +200,19 @@
     }
 
     // ===== Admin actions =====
-    document.getElementById("saveListsBtn").addEventListener("click", async () => {
-      const emails = document.getElementById("emailsText").value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      const codes = document.getElementById("codesText").value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      adminMsg.textContent = "Saving lists...";
-      const r = await postAction({ action: "saveLists", payload: { emails, codes } });
-      adminMsg.textContent = r.message || "Lists saved.";
-    });
-
     document.getElementById("generate").addEventListener("click", async () => {
+      const emails = document.getElementById("emailsText").value
+        .split(/\r?\n/).map(e => e.trim()).filter(Boolean);
+      const codes = document.getElementById("codesText").value
+        .split(/\r?\n/).map(c => c.trim()).filter(Boolean);
+
+      if (!emails.length || !codes.length) {
+        adminMsg.textContent = "Both emails and codenames are required!";
+        return;
+      }
+
       adminMsg.textContent = "Generating assignments...";
-      const r = await postAction({ action: "generateAssignments" });
+      const r = await postAction({ action: "generateAssignments", payload: { emails, codes } });
       adminMsg.textContent = r.message || "Assignments generated.";
     });
 
@@ -219,12 +220,14 @@
       adminMsg.textContent = "Resetting list...";
       const r = await postAction({ action: "resetAssignments" });
       adminMsg.textContent = r.message || "List reset.";
+      document.getElementById("emailsText").value = "";
+      document.getElementById("codesText").value = "";
     });
 
     document.getElementById("seeResults").addEventListener("click", async () => {
       const r = await getAction({ action: "getSheetUrl" });
       if (r.sheetUrl) window.open(r.sheetUrl, "_blank");
-      else adminMsg.textContent = "Could not open list.";
+      else adminMsg.textContent = "Could not open sheet.";
     });
 
     // ===== User Roulette =====
@@ -237,7 +240,7 @@
       resultDiv.textContent = "Summoning your fate...";
       const r = await getAction({ action: "getAssignment", email });
       if (r.ok) {
-        resultDiv.textContent = `🎃 Your fate's code name and gender is: ${r.code} (${r.gender})`;
+        resultDiv.textContent = `🎃 Your code name is: ${r.code} (${r.gender})`;
       } else {
         resultDiv.textContent = `👻 ${r.message}`;
       }
