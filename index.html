@@ -112,7 +112,7 @@
   </div>
 
   <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrMgggycJgs3mO3-DdTx8r6iXNj7VaYIqzj33MeXLCwQve2r_BG22hs1pNWCGFiun8/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNQlx7qtvwK_aEXm1g7UVdIK0QrG504PRWkfKLzYXxUdKG3daDt9LEvJW0a1WO94q-/exec";
 
 // 🧿 Reveal assigned partner
 async function checkAssignment() {
@@ -127,7 +127,7 @@ async function checkAssignment() {
   resultDiv.textContent = "🔮 Consulting the spirits...";
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`, { method: "GET", mode: "cors" });
+    const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`, { method: "GET" });
     if (!res.ok) throw new Error(`Server responded with ${res.status}`);
     const data = await res.json();
 
@@ -154,7 +154,7 @@ async function generateAssignments() {
 
   try {
     const body = new URLSearchParams({ emails, codenames });
-    const res = await fetch(SCRIPT_URL, { method: "POST", body, mode: "cors" });
+    const res = await fetch(SCRIPT_URL, { method: "POST", body });
     if (!res.ok) throw new Error(`Server responded with ${res.status}`);
     const data = await res.json();
 
@@ -174,7 +174,7 @@ async function clearAssignments() {
   if (!confirm("⚠️ Are you sure you want to reset all assignments?")) return;
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?reset=true`, { method: "GET", mode: "cors" });
+    const res = await fetch(`${SCRIPT_URL}?reset=true`, { method: "GET" });
     if (!res.ok) throw new Error(`Server responded with ${res.status}`);
     await res.json();
     alert("🧹 All assignments cleared!");
