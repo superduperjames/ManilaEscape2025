@@ -58,7 +58,6 @@
     }
     .modal.show { display: flex; opacity: 1; pointer-events: auto; animation: ghostAppear 0.8s ease; }
     @keyframes ghostAppear { 0% { opacity: 0; transform: scale(0.95); filter: blur(4px); } 100% { opacity: 1; transform: scale(1); filter: blur(0); } }
-    @keyframes ghostFadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
     .modal-content {
       background: rgba(20,20,20,0.92);
       border-radius: 12px; padding: 25px 30px;
@@ -128,8 +127,8 @@ async function checkAssignment() {
   resultDiv.textContent = "🔮 Consulting the spirits...";
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
-    if (!res.ok) throw new Error(`Server error (${res.status})`);
+    const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`, { method: "GET", mode: "cors" });
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
     const data = await res.json();
 
     if (data.error) {
@@ -138,8 +137,8 @@ async function checkAssignment() {
       resultDiv.innerHTML = `🕯️ <b>Code Name:</b> ${data.assignedCodeName}<br>🎭 <b>Gender:</b> ${data.assignedGender}`;
     }
   } catch (err) {
-    console.error("Error in checkAssignment():", err);
-    resultDiv.textContent = "💀 Something went wrong while summoning your fate.";
+    console.error("Fetch error:", err);
+    resultDiv.textContent = "💀 Failed to reach the spirits. Check your connection or try again.";
   }
 }
 
@@ -155,8 +154,8 @@ async function generateAssignments() {
 
   try {
     const body = new URLSearchParams({ emails, codenames });
-    const res = await fetch(SCRIPT_URL, { method: "POST", body });
-    if (!res.ok) throw new Error(`Server error (${res.status})`);
+    const res = await fetch(SCRIPT_URL, { method: "POST", body, mode: "cors" });
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
     const data = await res.json();
 
     if (data.status === "success") {
@@ -175,10 +174,9 @@ async function clearAssignments() {
   if (!confirm("⚠️ Are you sure you want to reset all assignments?")) return;
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?reset=true`);
-    if (!res.ok) throw new Error(`Server error (${res.status})`);
-    const data = await res.json();
-
+    const res = await fetch(`${SCRIPT_URL}?reset=true`, { method: "GET", mode: "cors" });
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+    await res.json();
     alert("🧹 All assignments cleared!");
   } catch (err) {
     console.error("Error in clearAssignments():", err);
